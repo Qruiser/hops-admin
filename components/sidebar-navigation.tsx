@@ -17,6 +17,7 @@ import {
   FileText,
   MessageSquare,
   SearchIcon,
+  Home,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -68,11 +69,14 @@ export function SidebarNavigation() {
     <div className="flex h-full w-64 flex-col border-r bg-background">
       <div className="flex h-20 items-center border-b px-4">
         <Link href="/" className="flex items-center gap-2 font-semibold">
-          <span className="text-xl">Ops Product</span>
+          <span className="text-xl">HOPS Admin</span>
         </Link>
       </div>
       <div className="flex-1 overflow-auto py-2">
         <nav className="grid gap-1 px-2">
+          {/* Home/Dashboard - Standalone item */}
+          <NavItem href="/" icon={Home} label="Home" active={pathname === "/"} />
+
           <Collapsible open={openModules.recruitment} onOpenChange={() => toggleModule("recruitment")}>
             <CollapsibleTrigger asChild>
               <Button variant="ghost" className="w-full justify-start gap-2">
@@ -83,11 +87,10 @@ export function SidebarNavigation() {
             </CollapsibleTrigger>
             <CollapsibleContent className="pl-6 pt-1">
               <div className="grid gap-1">
-                <NavItem href="/" icon={BarChart} label="Dashboard" active={pathname === "/"} />
                 <NavItem
                   href="/opportunities"
                   icon={Briefcase}
-                  label="Opportunities"
+                  label="Roles"
                   active={pathname.startsWith("/opportunities")}
                   count={5}
                 />

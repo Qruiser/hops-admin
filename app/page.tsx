@@ -1,289 +1,317 @@
 "use client"
 
 import { useState } from "react"
-import { OpportunityCard } from "@/components/opportunity-card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select"
-import { Plus, Filter, Archive, Search, SlidersHorizontal } from "lucide-react"
-import { CreateOpportunityDialog } from "@/components/create-opportunity-dialog"
-import { FilterDialog } from "@/components/filter-dialog"
-import { CompanyListView } from "@/components/company-list-view"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+import { 
+  Users, 
+  Briefcase, 
+  Building, 
+  TrendingUp, 
+  Clock, 
+  CheckCircle, 
+  AlertCircle,
+  Plus,
+  ArrowRight,
+  Star,
+  Target,
+  Calendar
+} from "lucide-react"
+import Link from "next/link"
 
-// Sample data for opportunities
-const opportunities = [
+// Dashboard data
+const dashboardStats = {
+  totalRoles: 24,
+  activeRoles: 18,
+  totalCandidates: 1247,
+  newCandidates: 23,
+  totalClients: 12,
+  activeClients: 8,
+  placementsThisMonth: 5,
+  targetPlacements: 8,
+  avgTimeToHire: 21,
+  candidateSatisfaction: 4.8
+}
+
+const recentActivity = [
   {
     id: "1",
-    title: "Senior Frontend Developer",
-    company: "TechCorp",
-    companyLogo: "/placeholder.svg?height=40&width=40",
-    workType: "Remote",
-    location: "United States",
-    employmentType: "Full-time",
-    status: "active",
-    isHot: true,
-    isAging: false,
-    applications: 24,
-    matchPercentage: 85,
-    recommended: 6,
-    shortlisted: 3,
-    lastUpdated: "2023-05-15",
-    notifications: 5, // Added notifications
+    type: "application",
+    title: "New application received",
+    description: "John Smith applied for Senior Frontend Developer at TechCorp",
+    time: "2 minutes ago",
+    icon: Users,
+    color: "text-blue-600"
   },
   {
     id: "2",
-    title: "Product Manager",
-    company: "FinanceHub",
-    companyLogo: "/placeholder.svg?height=40&width=40",
-    workType: "Hybrid",
-    location: "New York, NY",
-    employmentType: "Full-time",
-    status: "active",
-    isHot: false,
-    isAging: true,
-    applications: 18,
-    matchPercentage: 72,
-    recommended: 4,
-    shortlisted: 1,
-    lastUpdated: "2023-04-28",
-    notifications: 2, // Added notifications
+    type: "interview",
+    title: "Interview scheduled",
+    description: "Sarah Johnson - Product Manager at FinanceHub",
+    time: "1 hour ago",
+    icon: Calendar,
+    color: "text-green-600"
   },
   {
     id: "3",
-    title: "DevOps Engineer",
-    company: "CloudTech",
-    companyLogo: "/placeholder.svg?height=40&width=40",
-    workType: "On-site",
-    location: "San Francisco, CA",
-    employmentType: "Contract",
-    status: "paused",
-    isHot: false,
-    isAging: false,
-    applications: 12,
-    matchPercentage: 90,
-    recommended: 3,
-    shortlisted: 2,
-    lastUpdated: "2023-05-10",
-    notifications: 0, // Added notifications
+    type: "placement",
+    title: "Placement completed",
+    description: "Mike Chen placed as DevOps Engineer at CloudTech",
+    time: "3 hours ago",
+    icon: CheckCircle,
+    color: "text-emerald-600"
   },
   {
     id: "4",
-    title: "UX Designer",
-    company: "CreativeStudio",
-    companyLogo: "/placeholder.svg?height=40&width=40",
-    workType: "Remote",
-    location: "Anywhere",
-    employmentType: "Full-time",
-    status: "active",
-    isHot: true,
-    isAging: false,
-    applications: 32,
-    matchPercentage: 78,
-    recommended: 8,
-    shortlisted: 4,
-    lastUpdated: "2023-05-12",
-    notifications: 3, // Added notifications
-  },
-  {
-    id: "5",
-    title: "Data Scientist",
-    company: "AnalyticsPro",
-    companyLogo: "/placeholder.svg?height=40&width=40",
-    workType: "Hybrid",
-    location: "Boston, MA",
-    employmentType: "Full-time",
-    status: "active",
-    isHot: false,
-    isAging: true,
-    applications: 15,
-    matchPercentage: 82,
-    recommended: 5,
-    shortlisted: 1,
-    lastUpdated: "2023-04-25",
-    notifications: 0, // Added notifications
-  },
+    type: "urgent",
+    title: "Urgent: Client feedback needed",
+    description: "CreativeStudio needs feedback on UX Designer candidates",
+    time: "5 hours ago",
+    icon: AlertCircle,
+    color: "text-orange-600"
+  }
 ]
 
-const companies = [
+const topPerformers = [
   {
     id: "1",
-    name: "TechCorp",
-    logo: "/placeholder.svg?height=40&width=40",
-    lastActivity: "Today",
-    activeRoles: 5,
-    notifications: 3,
+    name: "Sarah Johnson",
+    role: "Product Manager",
+    company: "FinanceHub",
+    matchScore: 95,
+    status: "Interview Scheduled"
   },
   {
     id: "2",
-    name: "FinanceHub",
-    logo: "/placeholder.svg?height=40&width=40",
-    lastActivity: "Yesterday",
-    activeRoles: 3,
-    notifications: 1,
+    name: "Alex Chen",
+    role: "Senior Frontend Developer",
+    company: "TechCorp",
+    matchScore: 92,
+    status: "Shortlisted"
   },
   {
     id: "3",
-    name: "CloudTech",
-    logo: "/placeholder.svg?height=40&width=40",
-    lastActivity: "3 days ago",
-    activeRoles: 2,
-    notifications: 0,
+    name: "Maria Rodriguez",
+    role: "UX Designer",
+    company: "CreativeStudio",
+    matchScore: 88,
+    status: "Under Review"
+  }
+]
+
+const upcomingDeadlines = [
+  {
+    id: "1",
+    title: "TechCorp - Senior Frontend Developer",
+    deadline: "2024-01-15",
+    daysLeft: 3,
+    priority: "high"
   },
   {
-    id: "4",
-    name: "CreativeStudio",
-    logo: "/placeholder.svg?height=40&width=40",
-    lastActivity: "Today",
-    activeRoles: 4,
-    notifications: 2,
+    id: "2",
+    title: "FinanceHub - Product Manager",
+    deadline: "2024-01-18",
+    daysLeft: 6,
+    priority: "medium"
   },
   {
-    id: "5",
-    name: "AnalyticsPro",
-    logo: "/placeholder.svg?height=40&width=40",
-    lastActivity: "1 week ago",
-    activeRoles: 1,
-    notifications: 0,
-  },
+    id: "3",
+    title: "CloudTech - DevOps Engineer",
+    deadline: "2024-01-22",
+    daysLeft: 10,
+    priority: "low"
+  }
 ]
 
 export default function Home() {
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [sortOption, setSortOption] = useState("lastUpdated")
-  const [viewMode, setViewMode] = useState("active")
-  const [viewType, setViewType] = useState("opportunities")
-
-  // Filter opportunities based on search term and view mode
-  const filteredOpportunities = opportunities.filter((opportunity) => {
-    const matchesSearch =
-      opportunity.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      opportunity.company.toLowerCase().includes(searchTerm.toLowerCase())
-
-    const matchesViewMode =
-      (viewMode === "active" && opportunity.status === "active") ||
-      (viewMode === "paused" && opportunity.status === "paused") ||
-      viewMode === "all"
-
-    return matchesSearch && matchesViewMode
-  })
-
-  // Sort opportunities based on sort option
-  const sortedOpportunities = [...filteredOpportunities].sort((a, b) => {
-    switch (sortOption) {
-      case "lastUpdated":
-        return new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime()
-      case "applications":
-        return b.applications - a.applications
-      case "matchPercentage":
-        return b.matchPercentage - a.matchPercentage
-      case "shortlisted":
-        return b.shortlisted - a.shortlisted
-      case "notifications": // Added new sort option
-        return b.notifications - a.notifications
-      default:
-        return 0
-    }
-  })
-
   return (
     <div className="container max-w-[1600px] mx-auto p-4 py-8">
-
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        <Tabs defaultValue="active" value={viewMode} onValueChange={setViewMode} className="w-full md:w-auto">
-          <TabsList>
-            <TabsTrigger value="active">Active</TabsTrigger>
-            <TabsTrigger value="paused">Paused</TabsTrigger>
-            <TabsTrigger value="all">All</TabsTrigger>
-          </TabsList>
-        </Tabs>
-
-        <Tabs defaultValue="opportunities" value={viewType} onValueChange={setViewType} className="w-full md:w-auto">
-          <TabsList>
-            <TabsTrigger value="opportunities">Opportunities</TabsTrigger>
-            <TabsTrigger value="companies">Companies</TabsTrigger>
-          </TabsList>
-        </Tabs>
-
-        <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={viewType === "opportunities" ? "Search opportunities..." : "Search companies..."}
-              className="pl-8"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-
-          <Select value={sortOption} onValueChange={setSortOption}>
-            <SelectTrigger className="w-full sm:w-auto">
-              <div className="flex items-center">
-                <SlidersHorizontal className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Sort by: </span>
-                {sortOption === "lastUpdated" && "Last Updated"}
-                {sortOption === "applications" && "Applications"}
-                {sortOption === "matchPercentage" && "Match %"}
-                {sortOption === "shortlisted" && "Shortlisted"}
-                {sortOption === "notifications" && "Notifications"}
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="lastUpdated">Last Updated</SelectItem>
-              <SelectItem value="applications">Applications</SelectItem>
-              <SelectItem value="matchPercentage">Match %</SelectItem>
-              <SelectItem value="shortlisted">Shortlisted</SelectItem>
-              <SelectItem value="notifications">Notifications</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Button variant="outline" onClick={() => setIsFilterDialogOpen(true)}>
-            <Filter className="h-4 w-4 mr-2" />
-            Filter
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div className="flex gap-2">
+          <Button asChild>
+            <Link href="/opportunities">
+              <Plus className="h-4 w-4 mr-2" />
+              New Role
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="/talent">
+              <Users className="h-4 w-4 mr-2" />
+              View Talent Pool
+            </Link>
           </Button>
         </div>
       </div>
 
-      {viewType === "opportunities" ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sortedOpportunities.map((opportunity) => (
-            <OpportunityCard key={opportunity.id} opportunity={opportunity} />
-          ))}
-        </div>
-      ) : (
-        <CompanyListView companies={companies} searchTerm={searchTerm} />
-      )}
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Roles</CardTitle>
+            <Briefcase className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{dashboardStats.activeRoles}</div>
+            <p className="text-xs text-muted-foreground">
+              {dashboardStats.totalRoles} total roles
+            </p>
+          </CardContent>
+        </Card>
 
-      {viewType === "opportunities" && sortedOpportunities.length === 0 && (
-        <div className="text-center py-12">
-          <h3 className="text-lg font-medium">No opportunities found</h3>
-          <p className="text-muted-foreground">Try adjusting your search or filters</p>
-        </div>
-      )}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Candidates</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{dashboardStats.totalCandidates.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">
+              +{dashboardStats.newCandidates} new this week
+            </p>
+          </CardContent>
+        </Card>
 
-      {/* Floating Action Buttons */}
-      <div className="fixed bottom-6 right-6 flex flex-col gap-2">
-        <Button size="icon" className="h-14 w-14 rounded-full shadow-lg" onClick={() => setIsCreateDialogOpen(true)}>
-          <Plus className="h-6 w-6" />
-        </Button>
-        <Button
-          size="icon"
-          variant="outline"
-          className="h-12 w-12 rounded-full shadow-lg bg-background"
-          onClick={() => setIsFilterDialogOpen(true)}
-        >
-          <Filter className="h-5 w-5" />
-        </Button>
-        <Button size="icon" variant="outline" className="h-12 w-12 rounded-full shadow-lg bg-background">
-          <Archive className="h-5 w-5" />
-        </Button>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Clients</CardTitle>
+            <Building className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{dashboardStats.activeClients}</div>
+            <p className="text-xs text-muted-foreground">
+              {dashboardStats.totalClients} total clients
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Monthly Placements</CardTitle>
+            <Target className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{dashboardStats.placementsThisMonth}</div>
+            <p className="text-xs text-muted-foreground">
+              {dashboardStats.targetPlacements} target this month
+            </p>
+            <Progress 
+              value={(dashboardStats.placementsThisMonth / dashboardStats.targetPlacements) * 100} 
+              className="mt-2"
+            />
+          </CardContent>
+        </Card>
       </div>
 
-      <CreateOpportunityDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} />
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        {/* Recent Activity */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+            <CardDescription>Latest updates from your recruitment pipeline</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {recentActivity.map((activity) => {
+                const Icon = activity.icon
+                return (
+                  <div key={activity.id} className="flex items-start space-x-3">
+                    <div className={`p-2 rounded-full bg-muted ${activity.color}`}>
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <p className="text-sm font-medium">{activity.title}</p>
+                      <p className="text-sm text-muted-foreground">{activity.description}</p>
+                      <p className="text-xs text-muted-foreground">{activity.time}</p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            <div className="mt-4">
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/talent/communications">
+                  View All Activity
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-      <FilterDialog open={isFilterDialogOpen} onOpenChange={setIsFilterDialogOpen} />
+        {/* Top Performers */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Performers</CardTitle>
+            <CardDescription>Highest scoring candidates</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {topPerformers.map((performer) => (
+                <div key={performer.id} className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium">{performer.name}</p>
+                    <p className="text-xs text-muted-foreground">{performer.role} at {performer.company}</p>
+                    <Badge variant="secondary" className="text-xs">
+                      {performer.status}
+                    </Badge>
+                  </div>
+                  <div className="text-right">
+                    <div className="flex items-center space-x-1">
+                      <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                      <span className="text-sm font-medium">{performer.matchScore}%</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4">
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/talent">
+                  View All Candidates
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Upcoming Deadlines */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Upcoming Deadlines</CardTitle>
+            <CardDescription>Roles requiring immediate attention</CardDescription>
+          </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {upcomingDeadlines.map((deadline) => (
+              <div key={deadline.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="space-y-1">
+                  <p className="font-medium">{deadline.title}</p>
+                  <div className="flex items-center space-x-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">
+                      {deadline.daysLeft} days left
+                    </span>
+                    <Badge 
+                      variant={deadline.priority === "high" ? "destructive" : deadline.priority === "medium" ? "default" : "secondary"}
+                    >
+                      {deadline.priority} priority
+                    </Badge>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm">
+                  View Details
+                </Button>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

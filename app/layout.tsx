@@ -10,7 +10,7 @@ import { SidebarNavigation } from "@/components/sidebar-navigation"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Qrusible - Ops Product",
+  title: "HOPS Admin",
   description: "Internal operations platform for talent management",
     generator: 'v0.dev'
 }
