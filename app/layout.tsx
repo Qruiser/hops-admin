@@ -27,7 +27,7 @@ export default function RootLayout({
           <div className="relative flex min-h-screen">
             <SidebarNavigation />
             <div className="flex flex-1 flex-col">
-              <SiteHeader />
+              <SiteHeader title="Recruitment Dashboard" subtitle="Manage your recruitment opportunities and candidates" />
               <main className="flex-1 p-6">{children}</main>
               <SiteFooter />
             </div>

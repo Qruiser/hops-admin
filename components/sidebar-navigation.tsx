@@ -66,7 +66,7 @@ export function SidebarNavigation() {
 
   return (
     <div className="flex h-full w-64 flex-col border-r bg-background">
-      <div className="flex h-14 items-center border-b px-4">
+      <div className="flex h-20 items-center border-b px-4">
         <Link href="/" className="flex items-center gap-2 font-semibold">
           <span className="text-xl">Ops Product</span>
         </Link>

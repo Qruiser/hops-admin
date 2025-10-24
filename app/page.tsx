@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { OpportunityCard } from "@/components/opportunity-card"
-import { PageHeader } from "@/components/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -191,7 +190,6 @@ export default function Home() {
 
   return (
     <div className="container max-w-[1600px] mx-auto p-4 py-8">
-      <PageHeader title="Recruitment Dashboard" description="Manage your recruitment opportunities and candidates" />
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <Tabs defaultValue="active" value={viewMode} onValueChange={setViewMode} className="w-full md:w-auto">
