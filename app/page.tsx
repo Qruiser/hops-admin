@@ -128,8 +128,79 @@ const upcomingDeadlines = [
 export default function Home() {
   return (
     <div className="container max-w-[1600px] mx-auto p-4 py-8">
-      {/* Header */}
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" asChild>
+          <Link href="/opportunities">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Roles</CardTitle>
+              <Briefcase className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{dashboardStats.activeRoles}</div>
+              <p className="text-xs text-muted-foreground">
+                {dashboardStats.totalRoles} total roles
+              </p>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" asChild>
+          <Link href="/talent">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Candidates</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{dashboardStats.totalCandidates.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground">
+                +{dashboardStats.newCandidates} new this week
+              </p>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" asChild>
+          <Link href="/clients">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Clients</CardTitle>
+              <Building className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{dashboardStats.activeClients}</div>
+              <p className="text-xs text-muted-foreground">
+                {dashboardStats.totalClients} total clients
+              </p>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" asChild>
+          <Link href="/talent">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Monthly Placements</CardTitle>
+              <Target className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{dashboardStats.placementsThisMonth}</div>
+              <p className="text-xs text-muted-foreground">
+                {dashboardStats.targetPlacements} target this month
+              </p>
+              <Progress 
+                value={(dashboardStats.placementsThisMonth / dashboardStats.targetPlacements) * 100} 
+                className="mt-2"
+              />
+            </CardContent>
+          </Link>
+        </Card>
+      </div>
+
+      {/* Feed Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Recent activity</h2>
+          <p className="text-muted-foreground">Stay updated with your latest recruitment activities</p>
+        </div>
         <div className="flex gap-2">
           <Button asChild>
             <Link href="/opportunities">
@@ -146,75 +217,16 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Roles</CardTitle>
-            <Briefcase className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.activeRoles}</div>
-            <p className="text-xs text-muted-foreground">
-              {dashboardStats.totalRoles} total roles
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Candidates</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.totalCandidates.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              +{dashboardStats.newCandidates} new this week
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Clients</CardTitle>
-            <Building className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.activeClients}</div>
-            <p className="text-xs text-muted-foreground">
-              {dashboardStats.totalClients} total clients
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Monthly Placements</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.placementsThisMonth}</div>
-            <p className="text-xs text-muted-foreground">
-              {dashboardStats.targetPlacements} target this month
-            </p>
-            <Progress 
-              value={(dashboardStats.placementsThisMonth / dashboardStats.targetPlacements) * 100} 
-              className="mt-2"
-            />
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Recent Activity */}
         <Card className="lg:col-span-2">
-          <CardHeader>
+          {/* <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
             <CardDescription>Latest updates from your recruitment pipeline</CardDescription>
-          </CardHeader>
+          </CardHeader> */}
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-4 p-4">
               {recentActivity.map((activity) => {
                 const Icon = activity.icon
                 return (
@@ -280,38 +292,46 @@ export default function Home() {
         </Card>
       </div>
 
-      {/* Upcoming Deadlines */}
+      {/*  */}
         <Card>
           <CardHeader>
-            <CardTitle>Upcoming Deadlines</CardTitle>
+            <CardTitle>Prioritised roles</CardTitle>
             <CardDescription>Roles requiring immediate attention</CardDescription>
           </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {upcomingDeadlines.map((deadline) => (
-              <div key={deadline.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="space-y-1">
-                  <p className="font-medium">{deadline.title}</p>
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">
-                      {deadline.daysLeft} days left
-                    </span>
-                    <Badge 
-                      variant={deadline.priority === "high" ? "destructive" : deadline.priority === "medium" ? "default" : "secondary"}
-                    >
-                      {deadline.priority} priority
-                    </Badge>
+          <CardContent>
+            <div className="space-y-4">
+              {upcomingDeadlines.map((deadline) => (
+                <div key={deadline.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="space-y-1">
+                    <p className="font-medium">{deadline.title}</p>
+                    <div className="flex items-center space-x-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">
+                        {deadline.daysLeft} days left
+                      </span>
+                      <Badge 
+                        variant={deadline.priority === "high" ? "destructive" : deadline.priority === "medium" ? "default" : "secondary"}
+                      >
+                        {deadline.priority} priority
+                      </Badge>
+                    </div>
                   </div>
+                  <Button variant="outline" size="sm">
+                    View Details
+                  </Button>
                 </div>
-                <Button variant="outline" size="sm">
-                  View Details
-                </Button>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              ))}
+            </div>
+            <div className="mt-4">
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/opportunities">
+                  View All Roles
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
     </div>
   )
 }

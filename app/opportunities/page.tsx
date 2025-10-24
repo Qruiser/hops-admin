@@ -103,6 +103,42 @@ const opportunities = [
     lastUpdated: "2023-04-25",
     notifications: 0,
   },
+  {
+    id: "6",
+    title: "Senior Backend Engineer",
+    company: "TechStartup",
+    companyLogo: "/placeholder.svg?height=40&width=40",
+    workType: "Remote",
+    location: "United States",
+    employmentType: "Full-time",
+    status: "active",
+    isHot: true,
+    isAging: false,
+    applications: 45,
+    matchPercentage: 92,
+    recommended: 12,
+    shortlisted: 8,
+    lastUpdated: "2023-05-14",
+    notifications: 7,
+  },
+  {
+    id: "7",
+    title: "Head of Engineering",
+    company: "ScaleUp",
+    companyLogo: "/placeholder.svg?height=40&width=40",
+    workType: "Hybrid",
+    location: "San Francisco, CA",
+    employmentType: "Full-time",
+    status: "active",
+    isHot: true,
+    isAging: false,
+    applications: 38,
+    matchPercentage: 88,
+    recommended: 9,
+    shortlisted: 5,
+    lastUpdated: "2023-05-13",
+    notifications: 6,
+  },
 ]
 
 const companies = [
@@ -153,7 +189,7 @@ export default function OpportunitiesPage() {
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [sortOption, setSortOption] = useState("lastUpdated")
-  const [viewMode, setViewMode] = useState("active")
+  const [viewMode, setViewMode] = useState("priority")
   const [viewType, setViewType] = useState("opportunities")
 
   // Filter opportunities based on search term and view mode
@@ -165,6 +201,7 @@ export default function OpportunitiesPage() {
     const matchesViewMode =
       (viewMode === "active" && opportunity.status === "active") ||
       (viewMode === "paused" && opportunity.status === "paused") ||
+      (viewMode === "priority" && opportunity.isHot === true) ||
       viewMode === "all"
 
     return matchesSearch && matchesViewMode
@@ -191,8 +228,9 @@ export default function OpportunitiesPage() {
   return (
     <div className="container max-w-[1600px] mx-auto p-4 py-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        <Tabs defaultValue="active" value={viewMode} onValueChange={setViewMode} className="w-full md:w-auto">
+        <Tabs defaultValue="priority" value={viewMode} onValueChange={setViewMode} className="w-full md:w-auto">
           <TabsList>
+            <TabsTrigger value="priority">Priority</TabsTrigger>
             <TabsTrigger value="active">Active</TabsTrigger>
             <TabsTrigger value="paused">Paused</TabsTrigger>
             <TabsTrigger value="all">All</TabsTrigger>
