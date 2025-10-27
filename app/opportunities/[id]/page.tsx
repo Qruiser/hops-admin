@@ -1,19 +1,19 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
-import { PageHeader } from "@/components/page-header"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Breadcrumb } from "@/components/breadcrumb"
 import { CandidateLifecycle } from "@/components/candidate-lifecycle"
 import { OpportunityDetails } from "@/components/opportunity-details"
 import { AnalyticsDashboard } from "@/components/analytics-dashboard"
 import { Edit, ArrowLeft, Pause, Play, Archive, Share2 } from "lucide-react"
+import { useHeader } from "@/components/header-context"
 
 export default function OpportunityPage() {
   const params = useParams()
   const opportunityId = params.id as string
+  const { setHeader } = useHeader()
 
   // In a real app, you would fetch the opportunity details based on the ID
   const opportunity = {
@@ -52,25 +52,19 @@ export default function OpportunityPage() {
 
   const [activeTab, setActiveTab] = useState("lifecycle")
 
+  // Update the header with opportunity details
+  useEffect(() => {
+    setHeader(opportunity.title, `${opportunity.company} • ${opportunity.workType} • ${opportunity.location}`)
+    
+    // Cleanup: reset to default when component unmounts
+    return () => {
+      setHeader("Recruitment Dashboard", "Manage your recruitment opportunities and candidates")
+    }
+  }, [opportunity.title, opportunity.company, opportunity.workType, opportunity.location, setHeader])
+
   return (
     <div className="container max-w-[1600px] mx-auto p-2 py-4">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: "/" },
-          { label: opportunity.title, href: `/opportunities/${opportunityId}` },
-        ]}
-        className="text-xs mb-2"
-      />
-
       <div className="flex flex-col gap-2 mb-4">
-        <PageHeader
-          title={opportunity.title}
-          description={`${opportunity.company} • ${opportunity.workType} • ${opportunity.location}`}
-          className="py-1"
-          titleClassName="text-xl"
-          descriptionClassName="text-xs"
-        />
-
         <Tabs defaultValue="lifecycle" value={activeTab} onValueChange={setActiveTab}>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
             <TabsList className="h-8">

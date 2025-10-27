@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { OpportunityCard } from "@/components/opportunity-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,6 +10,7 @@ import { Plus, Filter, Archive, Search, SlidersHorizontal } from "lucide-react"
 import { CreateOpportunityDialog } from "@/components/create-opportunity-dialog"
 import { FilterDialog } from "@/components/filter-dialog"
 import { CompanyListView } from "@/components/company-list-view"
+import { useHeader } from "@/components/header-context"
 
 // Sample data for opportunities
 const opportunities = [
@@ -192,12 +193,23 @@ const companies = [
 ]
 
 export default function OpportunitiesPage() {
+  const { setHeader } = useHeader()
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [sortOption, setSortOption] = useState("lastUpdated")
   const [viewMode, setViewMode] = useState("priority")
   const [viewType, setViewType] = useState("opportunities")
+
+  // Update the header with page title
+  useEffect(() => {
+    setHeader("Opportunities", "Manage your recruitment opportunities and candidates")
+    
+    // Cleanup: reset to default when component unmounts
+    return () => {
+      setHeader("Recruitment Dashboard", "Manage your recruitment opportunities and candidates")
+    }
+  }, [setHeader])
 
   // Filter opportunities based on search term and view mode
   const filteredOpportunities = opportunities.filter((opportunity) => {

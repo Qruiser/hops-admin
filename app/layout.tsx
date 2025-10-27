@@ -3,9 +3,9 @@ import "@/app/globals.css"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
-import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { SidebarNavigation } from "@/components/sidebar-navigation"
+import { AppLayoutWrapper } from "@/components/app-layout-wrapper"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -27,8 +27,7 @@ export default function RootLayout({
           <div className="relative flex min-h-screen">
             <SidebarNavigation />
             <div className="flex flex-1 flex-col">
-              <SiteHeader title="Recruitment Dashboard" subtitle="Manage your recruitment opportunities and candidates" />
-              <main className="flex-1 p-6">{children}</main>
+              <AppLayoutWrapper mainContent={children} />
               <SiteFooter />
             </div>
           </div>
