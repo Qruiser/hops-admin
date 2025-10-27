@@ -48,7 +48,7 @@ interface OpportunityCardProps {
     recommended: number
     shortlisted: number
     lastUpdated: string
-    notifications: number // New field for notifications
+    notifications: number
   }
 }
 
@@ -62,6 +62,61 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
 
     return () => clearTimeout(timer)
   }
+
+  // Calculate momentum based on funnel speed and activity
+  const calculateMomentum = () => {
+    const { applications, matchPercentage, recommended, shortlisted } = opportunity
+    
+    // Calculate conversion rates at each stage
+    const matchRate = matchPercentage // Already a percentage (0-100)
+    const evaluationRate = applications > 0 ? (shortlisted / applications) * 100 : 0
+    const recommendationRate = applications > 0 ? (recommended / applications) * 100 : 0
+    
+    // Activity score (normalized applications 0-100)
+    const activityScore = Math.min(100, (applications / 50) * 100)
+    
+    // Conversion score based on funnel progression rates
+    const conversionScore = (matchRate * 0.4 + evaluationRate * 0.3 + recommendationRate * 0.3)
+    
+    // Momentum is a weighted combination of activity and conversion
+    // Activity is 40%, Conversion is 60%
+    const momentum = activityScore * 0.4 + conversionScore * 0.6
+    
+    return Math.round(Math.max(0, Math.min(100, momentum)))
+  }
+
+  const momentum = calculateMomentum()
+
+  // Get momentum-based styling - minimal approach
+  const getMomentumStyle = () => {
+    if (momentum >= 80) {
+      return {
+        borderColor: "border-emerald-500",
+        borderWidth: "border-2",
+        glow: "shadow shadow-emerald-100/50"
+      }
+    } else if (momentum >= 60) {
+      return {
+        borderColor: "border-blue-500",
+        borderWidth: "border-2",
+        glow: "shadow shadow-blue-100/50"
+      }
+    } else if (momentum >= 40) {
+      return {
+        borderColor: "border-amber-500",
+        borderWidth: "border-2",
+        glow: "shadow shadow-amber-100/50"
+      }
+    } else {
+      return {
+        borderColor: "border-slate-300",
+        borderWidth: "border",
+        glow: "shadow-sm"
+      }
+    }
+  }
+
+  const momentumStyle = getMomentumStyle()
 
   // Get stage badge color
   const getStageBadgeColor = (stage?: string) => {
@@ -83,56 +138,12 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
     }
   }
 
-  // Color palette system based on opportunity characteristics
-  const getCardColorPalette = () => {
-    if (opportunity.isHot) {
-      return {
-        card: "bg-gradient-to-br from-red-50 to-orange-50 border-red-100",
-        accent: "text-red-600",
-        badge: "bg-red-100 text-red-700 border-red-200",
-        metrics: "bg-red-50/50 border-red-100/50"
-      }
-    }
-    if (opportunity.isAging) {
-      return {
-        card: "bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100",
-        accent: "text-blue-600",
-        badge: "bg-blue-100 text-blue-700 border-blue-200",
-        metrics: "bg-blue-50/50 border-blue-100/50"
-      }
-    }
-    if (opportunity.status === "active") {
-      return {
-        card: "bg-gradient-to-br from-green-50 to-emerald-50 border-green-100",
-        accent: "text-green-600",
-        badge: "bg-green-100 text-green-700 border-green-200",
-        metrics: "bg-green-50/50 border-green-100/50"
-      }
-    }
-    if (opportunity.status === "paused") {
-      return {
-        card: "bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-100",
-        accent: "text-amber-600",
-        badge: "bg-amber-100 text-amber-700 border-amber-200",
-        metrics: "bg-amber-50/50 border-amber-100/50"
-      }
-    }
-    // Default palette
-    return {
-      card: "bg-gradient-to-br from-slate-50 to-gray-50 border-slate-100",
-      accent: "text-slate-600",
-      badge: "bg-slate-100 text-slate-700 border-slate-200",
-      metrics: "bg-slate-50/50 border-slate-100/50"
-    }
-  }
-
-  const colorPalette = getCardColorPalette()
   const stageBadgeColor = getStageBadgeColor(opportunity.stage)
 
   return (
     <Link href={`/opportunities/${opportunity.id}`} passHref>
       <Card
-        className={`cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200 h-full relative shadow-sm ${colorPalette.card}`}
+        className={`cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200 h-full relative ${momentumStyle.glow}`}
         onMouseDown={handleMouseDown}
         onMouseUp={() => setIsLongPressed(false)}
         onMouseLeave={() => setIsLongPressed(false)}
@@ -145,10 +156,11 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
             </Badge>
           </div>
         )}
-        <CardContent className="p-6 space-y-4">
+        <CardContent className="p-6 space-y-5">
+          {/* Header */}
           <div className="flex justify-between items-start">
-            <div className="flex items-start gap-4 flex-1 min-w-0">
-              <div className="relative h-12 w-12 rounded-lg overflow-hidden bg-muted/50 flex-shrink-0">
+            <div className="flex items-start gap-3 flex-1 min-w-0">
+              <div className="relative h-10 w-10 rounded-md overflow-hidden bg-muted/50 flex-shrink-0">
                 <Image
                   src={opportunity.companyLogo || "/placeholder.svg"}
                   alt={opportunity.company}
@@ -157,8 +169,8 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-xl line-clamp-1 text-foreground mb-1">{opportunity.title}</h3>
-                <p className="text-sm font-medium text-muted-foreground">{opportunity.company}</p>
+                <h3 className="font-semibold text-lg line-clamp-1 text-foreground mb-0.5">{opportunity.title}</h3>
+                <p className="text-xs text-muted-foreground">{opportunity.company}</p>
               </div>
             </div>
             <DropdownMenu>
@@ -198,80 +210,42 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
             </DropdownMenu>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge className={`rounded-md px-3 py-1 text-xs font-medium ${colorPalette.badge}`}>
-              {opportunity.workType}
-            </Badge>
-            <Badge variant="outline" className="rounded-md px-3 py-1 text-xs border-muted-foreground/20">
-              {opportunity.location}
-            </Badge>
-            <Badge variant="outline" className="rounded-md px-3 py-1 text-xs border-muted-foreground/20">
-              {opportunity.employmentType}
-            </Badge>
+          {/* Momentum - Centerpiece */}
+          <div className={`p-8 rounded-lg border-2 ${momentumStyle.borderColor} ${momentumStyle.glow} bg-muted/20`}>
+            <div className="text-center space-y-2">
+              <span className="text-xs font-medium text-muted-foreground tracking-wide uppercase">Momentum</span>
+              <p className={`text-6xl font-bold ${momentum >= 80 ? 'text-emerald-600' : momentum >= 60 ? 'text-blue-600' : momentum >= 40 ? 'text-amber-600' : 'text-slate-600'}`}>{momentum}</p>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          {/* Minimal Metrics */}
+          <div className="grid grid-cols-4 gap-3">
+            <div className="text-center space-y-1">
+              <p className="text-xs font-medium text-muted-foreground">Applications</p>
+              <p className="text-lg font-semibold text-foreground">{opportunity.applications}</p>
+            </div>
+            <div className="text-center space-y-1">
+              <p className="text-xs font-medium text-muted-foreground">Matched</p>
+              <p className="text-lg font-semibold text-foreground">{opportunity.matchPercentage}</p>
+            </div>
+            <div className="text-center space-y-1">
+              <p className="text-xs font-medium text-muted-foreground">Evaluated</p>
+              <p className="text-lg font-semibold text-foreground">{opportunity.shortlisted}</p>
+            </div>
+            <div className="text-center space-y-1">
+              <p className="text-xs font-medium text-muted-foreground">Recommended</p>
+              <p className="text-lg font-semibold text-foreground">{opportunity.recommended}</p>
+            </div>
+          </div>
+
+          {/* Minimal Info Footer */}
+          <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
+            <span>{opportunity.workType} · {opportunity.location}</span>
             {opportunity.stage && (
-              <Badge variant="outline" className={`rounded-md px-2 py-1 ${stageBadgeColor}`}>
+              <Badge variant="outline" className={`text-xs ${stageBadgeColor}`}>
                 {opportunity.stage}
               </Badge>
             )}
-            {opportunity.status === "active" && (
-              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 rounded-md px-2 py-1">
-                <CheckCircle2 className="h-3 w-3 mr-1" />
-                Active
-              </Badge>
-            )}
-            {opportunity.status === "paused" && (
-              <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 rounded-md px-2 py-1">
-                <PauseCircle className="h-3 w-3 mr-1" />
-                Paused
-              </Badge>
-            )}
-            {opportunity.isHot && !opportunity.stage && (
-              <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 rounded-md px-2 py-1">
-                <Flame className="h-3 w-3 mr-1" />
-                Hot
-              </Badge>
-            )}
-            {opportunity.isAging && (
-              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 rounded-md px-2 py-1">
-                <Clock className="h-3 w-3 mr-1" />
-                Aging
-              </Badge>
-            )}
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div className={`p-4 rounded-lg border ${colorPalette.metrics}`}>
-              <div className="flex items-center gap-2 mb-2">
-                <FileText className={`h-4 w-4 ${colorPalette.accent}`} />
-                <span className="text-sm font-medium text-muted-foreground">Applications</span>
-              </div>
-              <p className={`text-2xl font-bold ${colorPalette.accent}`}>{opportunity.applications}</p>
-            </div>
-
-            <div className={`p-4 rounded-lg border ${colorPalette.metrics}`}>
-              <div className="flex items-center gap-2 mb-2">
-                <Users className={`h-4 w-4 ${colorPalette.accent}`} />
-                <span className="text-sm font-medium text-muted-foreground">Recommended</span>
-              </div>
-              <p className={`text-2xl font-bold ${colorPalette.accent}`}>{opportunity.recommended}</p>
-            </div>
-
-            <div className={`p-4 rounded-lg border ${colorPalette.metrics}`}>
-              <div className="flex items-center gap-2 mb-2">
-                <Star className={`h-4 w-4 ${colorPalette.accent}`} />
-                <span className="text-sm font-medium text-muted-foreground">Shortlisted</span>
-              </div>
-              <p className={`text-2xl font-bold ${colorPalette.accent}`}>{opportunity.shortlisted}</p>
-            </div>
-          </div>
-
-          <div className="pt-2 border-t border-muted/50">
-            <p className="text-xs text-muted-foreground text-right">
-              Updated {new Date(opportunity.lastUpdated).toLocaleDateString()}
-            </p>
           </div>
         </CardContent>
       </Card>

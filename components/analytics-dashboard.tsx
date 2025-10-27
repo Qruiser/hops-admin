@@ -25,7 +25,7 @@ export function AnalyticsDashboard({ opportunity }: AnalyticsDashboardProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">New Applications</CardTitle>
+                <CardTitle className="text-sm font-medium">Applications</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">8</div>
@@ -38,7 +38,7 @@ export function AnalyticsDashboard({ opportunity }: AnalyticsDashboardProps) {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Avg. Match Score</CardTitle>
+                <CardTitle className="text-sm font-medium">Matched</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">76%</div>
@@ -51,7 +51,7 @@ export function AnalyticsDashboard({ opportunity }: AnalyticsDashboardProps) {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Recommendations</CardTitle>
+                <CardTitle className="text-sm font-medium">Evaluated</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">3</div>
@@ -101,7 +101,7 @@ export function AnalyticsDashboard({ opportunity }: AnalyticsDashboardProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total Applications</CardTitle>
+                <CardTitle className="text-sm font-medium">Applications</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">32</div>
@@ -114,7 +114,7 @@ export function AnalyticsDashboard({ opportunity }: AnalyticsDashboardProps) {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Avg. Match Score</CardTitle>
+                <CardTitle className="text-sm font-medium">Matched</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">79%</div>
@@ -127,7 +127,7 @@ export function AnalyticsDashboard({ opportunity }: AnalyticsDashboardProps) {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Recommendations</CardTitle>
+                <CardTitle className="text-sm font-medium">Evaluated</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">12</div>
