@@ -32,4 +32,7 @@ export interface Role {
   isPrincipal: boolean
   isFullTime: boolean
   isArchived: boolean
+  stage?: string
 }
+
+export type RoleStage = "Hot" | "Spec" | "Lead" | "Recommended" | "Sourcing" | "Awaiting Deployment"

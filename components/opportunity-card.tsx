@@ -40,6 +40,7 @@ interface OpportunityCardProps {
     location: string
     employmentType: string
     status: string
+    stage?: string
     isHot: boolean
     isAging: boolean
     applications: number
@@ -60,6 +61,26 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
     }, 500)
 
     return () => clearTimeout(timer)
+  }
+
+  // Get stage badge color
+  const getStageBadgeColor = (stage?: string) => {
+    switch (stage) {
+      case "Hot":
+        return "bg-red-100 text-red-700 border-red-200"
+      case "Spec":
+        return "bg-blue-100 text-blue-700 border-blue-200"
+      case "Lead":
+        return "bg-purple-100 text-purple-700 border-purple-200"
+      case "Recommended":
+        return "bg-green-100 text-green-700 border-green-200"
+      case "Sourcing":
+        return "bg-yellow-100 text-yellow-700 border-yellow-200"
+      case "Awaiting Deployment":
+        return "bg-teal-100 text-teal-700 border-teal-200"
+      default:
+        return "bg-slate-100 text-slate-700 border-slate-200"
+    }
   }
 
   // Color palette system based on opportunity characteristics
@@ -106,6 +127,7 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
   }
 
   const colorPalette = getCardColorPalette()
+  const stageBadgeColor = getStageBadgeColor(opportunity.stage)
 
   return (
     <Link href={`/opportunities/${opportunity.id}`} passHref>
@@ -189,6 +211,11 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
           </div>
 
           <div className="flex flex-wrap gap-2">
+            {opportunity.stage && (
+              <Badge variant="outline" className={`rounded-md px-2 py-1 ${stageBadgeColor}`}>
+                {opportunity.stage}
+              </Badge>
+            )}
             {opportunity.status === "active" && (
               <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 rounded-md px-2 py-1">
                 <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -201,7 +228,7 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
                 Paused
               </Badge>
             )}
-            {opportunity.isHot && (
+            {opportunity.isHot && !opportunity.stage && (
               <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 rounded-md px-2 py-1">
                 <Flame className="h-3 w-3 mr-1" />
                 Hot

@@ -22,6 +22,7 @@ const opportunities = [
     location: "United States",
     employmentType: "Full-time",
     status: "active",
+    stage: "Hot",
     isHot: true,
     isAging: false,
     applications: 24,
@@ -40,6 +41,7 @@ const opportunities = [
     location: "New York, NY",
     employmentType: "Full-time",
     status: "active",
+    stage: "Sourcing",
     isHot: false,
     isAging: true,
     applications: 18,
@@ -58,6 +60,7 @@ const opportunities = [
     location: "San Francisco, CA",
     employmentType: "Contract",
     status: "paused",
+    stage: "Spec",
     isHot: false,
     isAging: false,
     applications: 12,
@@ -76,6 +79,7 @@ const opportunities = [
     location: "Anywhere",
     employmentType: "Full-time",
     status: "active",
+    stage: "Recommended",
     isHot: true,
     isAging: false,
     applications: 32,
@@ -94,6 +98,7 @@ const opportunities = [
     location: "Boston, MA",
     employmentType: "Full-time",
     status: "active",
+    stage: "Lead",
     isHot: false,
     isAging: true,
     applications: 15,
@@ -112,6 +117,7 @@ const opportunities = [
     location: "United States",
     employmentType: "Full-time",
     status: "active",
+    stage: "Awaiting Deployment",
     isHot: true,
     isAging: false,
     applications: 45,
@@ -130,6 +136,7 @@ const opportunities = [
     location: "San Francisco, CA",
     employmentType: "Full-time",
     status: "active",
+    stage: "Hot",
     isHot: true,
     isAging: false,
     applications: 38,
@@ -240,7 +247,7 @@ export default function OpportunitiesPage() {
         <Tabs defaultValue="opportunities" value={viewType} onValueChange={setViewType} className="w-full md:w-auto">
           <TabsList>
             <TabsTrigger value="opportunities">Roles</TabsTrigger>
-            <TabsTrigger value="companies">Companies</TabsTrigger>
+            <TabsTrigger value="companies">Clients</TabsTrigger>
           </TabsList>
         </Tabs>
 
