@@ -12,14 +12,13 @@ import {
   RefreshCw,
   UserPlus,
   ArrowRight,
-  CheckCircle2,
   Archive,
   MapPin,
   Briefcase,
 } from "lucide-react"
-import { CandidateCard } from "../candidate-card"
-import { CandidateInfoPanel } from "../candidate-info-panel"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { CandidateCard } from "../candidate-card"
+import { CandidateScoringPanel } from "../candidate-scoring-panel"
 
 // Sample candidates data
 const candidates = [
@@ -106,10 +105,16 @@ const candidates = [
 ]
 
 export function SourceStage() {
-  const [selectedCandidate, setSelectedCandidate] = useState(candidates[0])
+  const [selectedCandidate, setSelectedCandidate] = useState<any>(null)
+  const [isPanelOpen, setIsPanelOpen] = useState(false)
 
   const handleSelectCandidate = (candidate: any) => {
     setSelectedCandidate(candidate)
+    setIsPanelOpen(true)
+  }
+
+  const closePanel = () => {
+    setIsPanelOpen(false)
   }
 
   return (
@@ -163,139 +168,123 @@ export function SourceStage() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {candidates.map((candidate) => (
-              <div
-                key={candidate.id}
-                onClick={() => handleSelectCandidate(candidate)}
-                className={`cursor-pointer ${selectedCandidate.id === candidate.id ? "ring-2 ring-primary ring-offset-2" : ""}`}
-              >
-                <CandidateCard candidate={candidate} />
-              </div>
-            ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {candidates.map((candidate) => (
+          <div key={candidate.id} onClick={() => handleSelectCandidate(candidate)} className="cursor-pointer">
+            <CandidateCard candidate={candidate} />
           </div>
+        ))}
+      </div>
+
+      {/* Sliding Panel */}
+      <CandidateScoringPanel
+        candidate={selectedCandidate}
+        title="Candidate Scoring"
+        isOpen={isPanelOpen}
+        onClose={closePanel}
+      >
+        {/* Stage-specific content */}
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-green-100">
+            <span className="text-3xl font-bold text-green-600">{selectedCandidate?.matchScore}%</span>
+          </div>
+          <p className="mt-2 font-medium">AI Match Score</p>
         </div>
 
-        <div>
-          <Card className="sticky top-6">
-            <CardHeader>
-              <CardTitle className="text-lg">Candidate Scoring</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Compact Candidate Info Panel */}
-              <CandidateInfoPanel candidate={selectedCandidate} />
+        {/* Matched Skills Section */}
+        {selectedCandidate?.matchedSkills && (
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium">Matched Skills</h4>
+            <div className="flex flex-wrap gap-2">
+              {selectedCandidate.matchedSkills.slice(0, 5).map((skill: string) => (
+                <Badge key={skill} variant="secondary" className="bg-green-50 text-green-700 border-green-200">
+                  {skill}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
 
-              {/* Stage-specific content - now more prominent */}
-              <div className="text-center">
-                <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-green-100">
-                  <span className="text-3xl font-bold text-green-600">{selectedCandidate.matchScore}%</span>
+        {/* Match breakdown */}
+        {selectedCandidate?.skillsMatch !== undefined && (
+          <div className="space-y-3">
+            {selectedCandidate.skillsMatch && (
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm">Skills Match</span>
+                  <span className="text-sm font-medium">{selectedCandidate.skillsMatch}%</span>
                 </div>
-                <p className="mt-2 font-medium">AI Match Score</p>
+                <Progress value={selectedCandidate.skillsMatch} className="h-2" />
               </div>
+            )}
 
-              {/* Matched Skills Section */}
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Matched Skills</h4>
-                <div className="flex flex-wrap gap-2">
-                  {selectedCandidate.matchedSkills.slice(0, 5).map((skill) => (
-                    <Badge key={skill} variant="secondary" className="bg-green-50 text-green-700 border-green-200">
-                      {skill}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm">Skills Match</span>
-                    <span className="text-sm font-medium">{selectedCandidate.skillsMatch}%</span>
+            {selectedCandidate.experienceMatch && (
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-1">
+                    <Briefcase className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-sm">Experience Match</span>
                   </div>
-                  <Progress value={selectedCandidate.skillsMatch} className="h-2" />
+                  <span className="text-sm font-medium">{selectedCandidate.experienceMatch}%</span>
                 </div>
-
-                {/* Enhanced Experience Section */}
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-1">
-                      <Briefcase className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span className="text-sm">Experience Match</span>
-                    </div>
-                    <span className="text-sm font-medium">{selectedCandidate.experienceMatch}%</span>
-                  </div>
-                  <Progress value={selectedCandidate.experienceMatch} className="h-2" />
+                <Progress value={selectedCandidate.experienceMatch} className="h-2" />
+                {selectedCandidate.currentPosition && (
                   <p className="text-xs text-muted-foreground mt-1">
                     {selectedCandidate.experience} as {selectedCandidate.currentPosition} at{" "}
                     {selectedCandidate.currentCompany}
                   </p>
-                </div>
+                )}
+              </div>
+            )}
 
-                {/* Enhanced Location Section */}
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-1">
-                      <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span className="text-sm">Location Match</span>
-                    </div>
-                    <span className="text-sm font-medium">{selectedCandidate.locationMatch}%</span>
+            {selectedCandidate.locationMatch && (
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-1">
+                    <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-sm">Location Match</span>
                   </div>
-                  <Progress value={selectedCandidate.locationMatch} className="h-2" />
-                  <p className="text-xs text-muted-foreground mt-1">{selectedCandidate.location}</p>
+                  <span className="text-sm font-medium">{selectedCandidate.locationMatch}%</span>
                 </div>
+                <Progress value={selectedCandidate.locationMatch} className="h-2" />
+                <p className="text-xs text-muted-foreground mt-1">{selectedCandidate.location}</p>
               </div>
+            )}
+          </div>
+        )}
 
-              <div className="flex items-center justify-between">
-                {selectedCandidate.potential === "high" && (
-                  <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
-                    <CheckCircle2 className="h-3 w-3 mr-1" />
-                    High Potential
-                  </Badge>
-                )}
+        {/* Actions */}
+        <div className="flex flex-col gap-2 pt-2">
+          <Button className="w-full gap-2">
+            <UserPlus className="h-4 w-4" />
+            Review Profile
+          </Button>
 
-                {selectedCandidate.potential === "medium" && (
-                  <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-200">
-                    <CheckCircle2 className="h-3 w-3 mr-1" />
-                    Good Fit
-                  </Badge>
-                )}
-              </div>
+          <div className="flex gap-2">
+            <Button className="flex-1 gap-2">
+              <ArrowRight className="h-4 w-4" />
+              Move to Screening
+            </Button>
 
-              <div className="flex flex-col gap-2 pt-2">
-                <Button className="w-full gap-2">
-                  <UserPlus className="h-4 w-4" />
-                  Review Profile
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <Archive className="h-4 w-4" />
+                  Archive
                 </Button>
-
-                <div className="flex gap-2">
-                  <Button className="flex-1 gap-2">
-                    <ArrowRight className="h-4 w-4" />
-                    Move to Screening
-                  </Button>
-
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className="gap-2">
-                        <Archive className="h-4 w-4" />
-                        Archive
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
-                      <DropdownMenuItem>Salary not match</DropdownMenuItem>
-                      <DropdownMenuItem>Doesn't want contract</DropdownMenuItem>
-                      <DropdownMenuItem>Skills not matched</DropdownMenuItem>
-                      <DropdownMenuItem>No contact information</DropdownMenuItem>
-                      <DropdownMenuItem>Doesn't want to complete profile</DropdownMenuItem>
-                      <DropdownMenuItem>Traits not matched</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem>Salary not match</DropdownMenuItem>
+                <DropdownMenuItem>Doesn't want contract</DropdownMenuItem>
+                <DropdownMenuItem>Skills not matched</DropdownMenuItem>
+                <DropdownMenuItem>No contact information</DropdownMenuItem>
+                <DropdownMenuItem>Doesn't want to complete profile</DropdownMenuItem>
+                <DropdownMenuItem>Traits not matched</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-      </div>
+      </CandidateScoringPanel>
     </div>
   )
 }
