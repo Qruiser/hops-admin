@@ -7,6 +7,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { CandidateLifecycle } from "@/components/candidate-lifecycle"
 import { OpportunityDetails } from "@/components/opportunity-details"
 import { AnalyticsDashboard } from "@/components/analytics-dashboard"
+import { OpportunityTimelineChart } from "@/components/opportunity-timeline-chart"
+import { generateOpportunityTimelineData } from "@/data/mock-timeline-data"
 import { Edit, ArrowLeft, Pause, Play, Archive, Share2, Briefcase, TrendingUp } from "lucide-react"
 import { useHeader } from "@/components/header-context"
 
@@ -51,6 +53,9 @@ export default function OpportunityPage() {
   }
 
   const [activeTab, setActiveTab] = useState("lifecycle")
+  
+  // Generate timeline data for the chart
+  const timelineData = generateOpportunityTimelineData()
 
   // Update the header with opportunity details
   useEffect(() => {
@@ -63,8 +68,14 @@ export default function OpportunityPage() {
   }, [opportunity.title, opportunity.company, opportunity.workType, opportunity.location, setHeader])
 
   return (
-    <div className="container max-w-[1600px] mx-auto p-6 py-8 space-y-6">
-      <Tabs defaultValue="lifecycle" value={activeTab} onValueChange={setActiveTab}>
+    <div className="w-full p-6 py-8 space-y-6">
+      {/* Timeline Chart - Full Width */}
+      <div className="w-full">
+        <OpportunityTimelineChart data={timelineData} />
+      </div>
+      
+      <div className="container max-w-[1600px] mx-auto">
+        <Tabs defaultValue="lifecycle" value={activeTab} onValueChange={setActiveTab}>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <TabsList className="h-10">
             <TabsTrigger value="lifecycle" className="px-4">
@@ -127,7 +138,8 @@ export default function OpportunityPage() {
         <TabsContent value="analytics" className="mt-4">
           <AnalyticsDashboard opportunity={opportunity} />
         </TabsContent>
-      </Tabs>
+        </Tabs>
+      </div>
     </div>
   )
 }
