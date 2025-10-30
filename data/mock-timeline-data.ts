@@ -80,3 +80,18 @@ export const generateOpportunityTimelineData = (seed: string): TimelineDataPoint
 
   return data
 }
+
+export const generateOpportunityTimelinePipelineData = (seed: string) => {
+  const legacyData = generateOpportunityTimelineData(seed);
+  // Map legacy data to new pipeline keys
+  return legacyData.map((item, idx) => ({
+    date: item.date,
+    sourcing: item.applications,
+    matching: item.matches,
+    deployability: item.evaluations,
+    verifications: item.evaluations, // Use same for now
+    recommendation: item.recommendations,
+    putting: Math.max(0, Math.floor(idx / 10)), // Simple progression/filler
+    deployment: item.deployments,
+  }));
+};

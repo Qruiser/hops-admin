@@ -44,26 +44,31 @@ export function getMomentumDescription(momentum: number): string {
   return "Flatlined"
 }
 
-// Helper: build an OpportunityLike from timeline data if needed
-export type TimelinePoint = { date: string; recommendations: number }
-
-export function buildOpportunityLikeFromTimeline(points: TimelinePoint[]): OpportunityLike {
+// Helper: build an OpportunityLike from pipeline timeline data
+export function buildOpportunityLikeFromTimeline(points: any[]): OpportunityLike {
   if (!points.length) {
     const today = new Date().toISOString()
     return { specCreated: today, firstRecommendation: null, lastRecommendation: null, recommendations: [] }
   }
 
   const specCreated = points[0].date
-  const firstPoint = points.find(p => (p.recommendations || 0) >= 1)
+  // Look for first nonzero at any stage
+  const firstPoint = points.find(p => (p.recommendation || p.putting || p.deployment || p.verifications || p.matching || p.sourcing || 0) >= 1)
 
   let lastRecommendationDate: string | null = null
   for (let i = 1; i < points.length; i++) {
-    if ((points[i].recommendations || 0) > (points[i - 1].recommendations || 0)) {
-      lastRecommendationDate = points[i].date
+    // If any increase in any stage, call it a 'recommendation'
+    const last = points[i - 1]
+    const curr = points[i]
+    if ((curr.recommendation || 0) > (last.recommendation || 0) ||
+        (curr.putting || 0) > (last.putting || 0) ||
+        (curr.deployment || 0) > (last.deployment || 0)) {
+      lastRecommendationDate = curr.date
     }
   }
 
-  const totalRecs = points[points.length - 1].recommendations || 0
+  // Use the maximum pipeline progress as recommendations
+  const totalRecs = points[points.length - 1].recommendation || points[points.length - 1].putting || points[points.length - 1].deployment || points[points.length - 1].verifications || points[points.length - 1].matching || points[points.length - 1].sourcing || 0;
   const recommendations = Array.from({ length: Math.max(0, totalRecs) }, () => points[points.length - 1].date)
 
   return {

@@ -298,20 +298,7 @@ export function DeployStage() {
       <div>
         <Card className="sticky top-6 max-h-[calc(100vh-6rem)] overflow-y-auto">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center justify-between">
-              Deployment Summary
-              {isDeployed ? (
-                <Badge className="bg-green-100 text-green-800 border-green-200">
-                  <CheckCircle2 className="h-3 w-3 mr-1" />
-                  Deployed
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-200">
-                  <FileCheck className="h-3 w-3 mr-1" />
-                  Pending Deployment
-                </Badge>
-              )}
-            </CardTitle>
+            <CardTitle>Deployment (onBoarding both parties into a relationship)</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Compact Candidate Info Panel */}

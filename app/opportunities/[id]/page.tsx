@@ -8,7 +8,7 @@ import { CandidateLifecycle } from "@/components/candidate-lifecycle"
 import { OpportunityDetails } from "@/components/opportunity-details"
 import { AnalyticsDashboard } from "@/components/analytics-dashboard"
 import { OpportunityTimelineChart } from "@/components/opportunity-timeline-chart"
-import { generateOpportunityTimelineData } from "@/data/mock-timeline-data"
+import { generateOpportunityTimelinePipelineData } from "@/data/mock-timeline-data"
 import { Edit, ArrowLeft, Pause, Play, Archive, Share2, Briefcase, TrendingUp } from "lucide-react"
 import { useHeader } from "@/components/header-context"
 import { getOpportunityById } from "@/data/mock-opportunities"
@@ -25,18 +25,20 @@ export default function OpportunityPage() {
     id: opportunityId,
     companyLogo: base.companyLogo || "/placeholder.svg?height=40&width=40",
     stages: {
-      source: { count: 24, avgTime: "2 days" },
-      screen: { count: 18, avgTime: "3 days" },
-      match: { count: 12, avgTime: "2 days" },
-      recommend: { count: 6, avgTime: "1 day" },
-      deploy: { count: 3, avgTime: "5 days" },
+      sourcing: { count: 24, avgTime: "2 days" },
+      matching: { count: 18, avgTime: "3 days" },
+      deployability: { count: 12, avgTime: "2 days" },
+      verifications: { count: 9, avgTime: "1 day" },
+      recommendation: { count: 6, avgTime: "1 day" },
+      putting: { count: 4, avgTime: "1 day" },
+      deployment: { count: 3, avgTime: "5 days" },
     },
   }
 
   const [activeTab, setActiveTab] = useState("lifecycle")
   
   // Generate timeline data for the chart (seeded per opportunity)
-  const timelineData = generateOpportunityTimelineData(opportunityId)
+  const timelineData = generateOpportunityTimelinePipelineData(opportunityId)
 
   // Update the header with opportunity details
   useEffect(() => {

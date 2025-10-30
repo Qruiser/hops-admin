@@ -15,26 +15,22 @@ interface CandidateLifecycleProps {
 }
 
 export function CandidateLifecycle({ opportunity }: CandidateLifecycleProps) {
-  const [activeStage, setActiveStage] = useState("source")
+  const [activeStage, setActiveStage] = useState("sourcing")
 
   const stages = [
-    { id: "source", label: "Source", icon: Users, count: opportunity.stages.source.count, color: "bg-blue-500" },
-    { id: "screen", label: "Screen", icon: UserCheck, count: opportunity.stages.screen.count, color: "bg-purple-500" },
-    { id: "match", label: "Match", icon: CheckCircle2, count: opportunity.stages.match.count, color: "bg-green-500" },
-    {
-      id: "recommend",
-      label: "Recommend",
-      icon: Star,
-      count: opportunity.stages.recommend.count,
-      color: "bg-amber-500",
-    },
-    { id: "deploy", label: "Deploy", icon: Briefcase, count: opportunity.stages.deploy.count, color: "bg-red-500" },
+    { id: "sourcing", label: "Sourcing", icon: Users, color: "bg-blue-500", count: opportunity.stages.sourcing?.count ?? 0 },
+    { id: "matching", label: "Matching Preferences", icon: Star, color: "bg-indigo-500", count: opportunity.stages.matching?.count ?? 0 },
+    { id: "deployability", label: "Deployability Check", icon: Briefcase, color: "bg-cyan-500", count: opportunity.stages.deployability?.count ?? 0 },
+    { id: "verifications", label: "Verifications", icon: CheckCircle2, color: "bg-purple-500", count: opportunity.stages.verifications?.count ?? 0 },
+    { id: "recommendation", label: "Recommendation", icon: Star, color: "bg-amber-500", count: opportunity.stages.recommendation?.count ?? 0 },
+    { id: "putting", label: "Putting", icon: Users, color: "bg-pink-500", count: opportunity.stages.putting?.count ?? 0 },
+    { id: "deployment", label: "Deployment", icon: UserCheck, color: "bg-green-500", count: opportunity.stages.deployment?.count ?? 0 },
   ]
 
   return (
     <div className="space-y-4">
-      <Tabs defaultValue="source" value={activeStage} onValueChange={setActiveStage}>
-        <TabsList className="grid grid-cols-5 mb-4">
+      <Tabs defaultValue="sourcing" value={activeStage} onValueChange={setActiveStage}>
+        <TabsList className="grid grid-cols-7 mb-4">
           {stages.map((stage) => (
             <TabsTrigger key={stage.id} value={stage.id} className="flex items-center gap-1 py-1.5">
               <stage.icon className="h-3.5 w-3.5" />
@@ -46,23 +42,26 @@ export function CandidateLifecycle({ opportunity }: CandidateLifecycleProps) {
           ))}
         </TabsList>
 
-        <TabsContent value="source">
+        <TabsContent value="sourcing">
           <SourceStage />
         </TabsContent>
-
-        <TabsContent value="screen">
-          <ScreeningStage />
-        </TabsContent>
-
-        <TabsContent value="match">
+        <TabsContent value="matching">
           <MatchStage />
         </TabsContent>
-
-        <TabsContent value="recommend">
+        <TabsContent value="deployability">
+          <ScreeningStage />
+        </TabsContent>
+        <TabsContent value="verifications">
+          <ScreeningStage />
+        </TabsContent>
+        <TabsContent value="recommendation">
           <RecommendStage />
         </TabsContent>
-
-        <TabsContent value="deploy">
+        <TabsContent value="putting">
+          {/* (Optional: create a PuttingStage, else use placeholder) */}
+          <div className="p-4 text-center text-muted-foreground">Helping both parties arrive at decision</div>
+        </TabsContent>
+        <TabsContent value="deployment">
           <DeployStage />
         </TabsContent>
       </Tabs>

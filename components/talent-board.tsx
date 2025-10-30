@@ -11,10 +11,13 @@ import { Column } from "./column"
 
 // Define candidate stages
 const columns = [
-  { id: "sourced", title: "Sourced" },
-  { id: "screened", title: "Screened" },
-  { id: "matched", title: "Matched" },
-  { id: "recommended", title: "Recommended" },
+  { id: "sourcing", title: "Sourcing" },
+  { id: "matching", title: "Matching" },
+  { id: "deployability", title: "Deployability" },
+  { id: "verifications", title: "Verifications" },
+  { id: "recommendation", title: "Recommendation" },
+  { id: "putting", title: "Putting" },
+  { id: "deployment", title: "Deployment" },
 ]
 
 // Sample candidate data
@@ -28,7 +31,7 @@ const initialCandidates = [
     skills: ["Java", "Spring", "SQL"],
     matchScore: 92,
     verified: true,
-    stage: "sourced",
+    stage: "sourcing",
     isPotentialPrincipal: false,
     notes: "",
     applyDate: new Date("2023-01-15").toISOString(),
@@ -42,7 +45,7 @@ const initialCandidates = [
     skills: ["React", "Node.js"],
     matchScore: 85,
     verified: true,
-    stage: "sourced",
+    stage: "sourcing",
     isPotentialPrincipal: false,
     notes: "",
     applyDate: new Date("2023-02-01").toISOString(),
@@ -56,7 +59,7 @@ const initialCandidates = [
     skills: ["Python", "Data Science"],
     matchScore: 78,
     verified: true,
-    stage: "screened",
+    stage: "matching",
     isPotentialPrincipal: false,
     notes: "",
     applyDate: new Date("2023-01-20").toISOString(),
@@ -70,7 +73,7 @@ const initialCandidates = [
     skills: ["JavaScript", "React", "Vue"],
     matchScore: 88,
     verified: true,
-    stage: "matched",
+    stage: "deployment",
     isPotentialPrincipal: true,
     notes: "Excellent candidate, ready for client recommendation",
     applyDate: new Date("2023-02-10").toISOString(),
@@ -84,7 +87,7 @@ const initialCandidates = [
     skills: ["Java", "Spring Boot", "Microservices"],
     matchScore: 91,
     verified: true,
-    stage: "recommended",
+    stage: "recommendation",
     isPotentialPrincipal: true,
     notes: "Excellent candidate, ready for offer",
     applyDate: new Date("2023-01-05").toISOString(),

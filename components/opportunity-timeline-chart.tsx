@@ -9,11 +9,13 @@ import { buildOpportunityLikeFromTimeline, calculateMomentumFromOpportunity, get
 
 interface TimelineDataPoint {
   date: string
-  applications: number
-  matches: number
-  evaluations: number
-  recommendations: number
-  deployments: number
+  sourcing: number
+  matching: number
+  deployability: number
+  verifications: number
+  recommendation: number
+  putting: number
+  deployment: number
 }
 
 interface OpportunityTimelineChartProps {
@@ -21,27 +23,35 @@ interface OpportunityTimelineChartProps {
 }
 
 const chartConfig = {
-  applications: {
-    label: "Applications",
+  sourcing: {
+    label: "Sourcing",
     color: "hsl(var(--chart-1))",
   },
-  matches: {
-    label: "Matches",
+  matching: {
+    label: "Matching Preferences",
     color: "hsl(var(--chart-2))",
   },
-  evaluations: {
-    label: "Evaluations",
+  deployability: {
+    label: "Deployability Check",
     color: "hsl(var(--chart-3))",
   },
-  recommendations: {
-    label: "Recommendations",
+  verifications: {
+    label: "Verifications",
     color: "hsl(var(--chart-4))",
   },
-  deployments: {
-    label: "Deployments",
+  recommendation: {
+    label: "Recommendation",
     color: "hsl(var(--chart-5))",
   },
-}
+  putting: {
+    label: "Putting",
+    color: "hsl(var(--chart-6))",
+  },
+  deployment: {
+    label: "Deployment",
+    color: "hsl(var(--chart-7))",
+  },
+};
 
 export function OpportunityTimelineChart({ data }: OpportunityTimelineChartProps) {
   const [isCollapsed, setIsCollapsed] = useState(true)
@@ -51,7 +61,7 @@ export function OpportunityTimelineChart({ data }: OpportunityTimelineChartProps
   const startDate = new Date(data[0]?.date || new Date())
   
   const milestoneDates = fibonacciMilestones.map(milestone => {
-    const milestoneData = data.find(point => point.recommendations >= milestone)
+    const milestoneData = data.find(point => point.recommendation >= milestone)
     if (!milestoneData) return null
     
     const milestoneDate = new Date(milestoneData.date)
@@ -70,36 +80,46 @@ export function OpportunityTimelineChart({ data }: OpportunityTimelineChartProps
   
   
   const momentumMetrics = {
-    applications: {
-      current: latestData?.applications || 0,
-      change: (latestData?.applications || 0) - (previousData?.applications || 0),
-      trend: (latestData?.applications || 0) > (previousData?.applications || 0) ? 'up' : 'down'
+    sourcing: {
+      current: latestData?.sourcing || 0,
+      change: (latestData?.sourcing || 0) - (previousData?.sourcing || 0),
+      trend: (latestData?.sourcing || 0) > (previousData?.sourcing || 0) ? 'up' : 'down'
     },
-    matches: {
-      current: latestData?.matches || 0,
-      change: (latestData?.matches || 0) - (previousData?.matches || 0),
-      trend: (latestData?.matches || 0) > (previousData?.matches || 0) ? 'up' : 'down'
+    matching: {
+      current: latestData?.matching || 0,
+      change: (latestData?.matching || 0) - (previousData?.matching || 0),
+      trend: (latestData?.matching || 0) > (previousData?.matching || 0) ? 'up' : 'down'
     },
-    evaluations: {
-      current: latestData?.evaluations || 0,
-      change: (latestData?.evaluations || 0) - (previousData?.evaluations || 0),
-      trend: (latestData?.evaluations || 0) > (previousData?.evaluations || 0) ? 'up' : 'down'
+    deployability: {
+      current: latestData?.deployability || 0,
+      change: (latestData?.deployability || 0) - (previousData?.deployability || 0),
+      trend: (latestData?.deployability || 0) > (previousData?.deployability || 0) ? 'up' : 'down'
     },
-    recommendations: {
-      current: latestData?.recommendations || 0,
-      change: (latestData?.recommendations || 0) - (previousData?.recommendations || 0),
-      trend: (latestData?.recommendations || 0) > (previousData?.recommendations || 0) ? 'up' : 'down'
+    verifications: {
+      current: latestData?.verifications || 0,
+      change: (latestData?.verifications || 0) - (previousData?.verifications || 0),
+      trend: (latestData?.verifications || 0) > (previousData?.verifications || 0) ? 'up' : 'down'
     },
-    deployments: {
-      current: latestData?.deployments || 0,
-      change: (latestData?.deployments || 0) - (previousData?.deployments || 0),
-      trend: (latestData?.deployments || 0) > (previousData?.deployments || 0) ? 'up' : 'down'
+    recommendation: {
+      current: latestData?.recommendation || 0,
+      change: (latestData?.recommendation || 0) - (previousData?.recommendation || 0),
+      trend: (latestData?.recommendation || 0) > (previousData?.recommendation || 0) ? 'up' : 'down'
+    },
+    putting: {
+      current: latestData?.putting || 0,
+      change: (latestData?.putting || 0) - (previousData?.putting || 0),
+      trend: (latestData?.putting || 0) > (previousData?.putting || 0) ? 'up' : 'down'
+    },
+    deployment: {
+      current: latestData?.deployment || 0,
+      change: (latestData?.deployment || 0) - (previousData?.deployment || 0),
+      trend: (latestData?.deployment || 0) > (previousData?.deployment || 0) ? 'up' : 'down'
     }
   }
 
   // Primary momentum identical to OpportunityCard
   const opportunityLike = buildOpportunityLikeFromTimeline(
-    data.map(d => ({ date: d.date, recommendations: d.recommendations }))
+    data.map(d => ({ date: d.date, recommendation: d.recommendation }))
   )
   const momentum = calculateMomentumFromOpportunity(opportunityLike)
   const momentumDescriptor = getMomentumDescription(momentum)
@@ -252,42 +272,58 @@ export function OpportunityTimelineChart({ data }: OpportunityTimelineChartProps
             
             <Line
               type="monotone"
-              dataKey="applications"
-              stroke="var(--color-applications)"
+              dataKey="sourcing"
+              stroke="var(--color-sourcing)"
               strokeWidth={3}
-              dot={{ fill: "var(--color-applications)", strokeWidth: 2, r: 5 }}
+              dot={{ fill: "var(--color-sourcing)", strokeWidth: 2, r: 5 }}
               activeDot={{ r: 8 }}
             />
             <Line
               type="monotone"
-              dataKey="matches"
-              stroke="var(--color-matches)"
+              dataKey="matching"
+              stroke="var(--color-matching)"
               strokeWidth={3}
-              dot={{ fill: "var(--color-matches)", strokeWidth: 2, r: 5 }}
+              dot={{ fill: "var(--color-matching)", strokeWidth: 2, r: 5 }}
               activeDot={{ r: 8 }}
             />
             <Line
               type="monotone"
-              dataKey="evaluations"
-              stroke="var(--color-evaluations)"
+              dataKey="deployability"
+              stroke="var(--color-deployability)"
               strokeWidth={3}
-              dot={{ fill: "var(--color-evaluations)", strokeWidth: 2, r: 5 }}
+              dot={{ fill: "var(--color-deployability)", strokeWidth: 2, r: 5 }}
               activeDot={{ r: 8 }}
             />
             <Line
               type="monotone"
-              dataKey="recommendations"
-              stroke="var(--color-recommendations)"
+              dataKey="verifications"
+              stroke="var(--color-verifications)"
               strokeWidth={3}
-              dot={{ fill: "var(--color-recommendations)", strokeWidth: 2, r: 5 }}
+              dot={{ fill: "var(--color-verifications)", strokeWidth: 2, r: 5 }}
               activeDot={{ r: 8 }}
             />
             <Line
               type="monotone"
-              dataKey="deployments"
-              stroke="var(--color-deployments)"
+              dataKey="recommendation"
+              stroke="var(--color-recommendation)"
               strokeWidth={3}
-              dot={{ fill: "var(--color-deployments)", strokeWidth: 2, r: 5 }}
+              dot={{ fill: "var(--color-recommendation)", strokeWidth: 2, r: 5 }}
+              activeDot={{ r: 8 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="putting"
+              stroke="var(--color-putting)"
+              strokeWidth={3}
+              dot={{ fill: "var(--color-putting)", strokeWidth: 2, r: 5 }}
+              activeDot={{ r: 8 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="deployment"
+              stroke="var(--color-deployment)"
+              strokeWidth={3}
+              dot={{ fill: "var(--color-deployment)", strokeWidth: 2, r: 5 }}
               activeDot={{ r: 8 }}
             />
           </LineChart>
@@ -299,23 +335,31 @@ export function OpportunityTimelineChart({ data }: OpportunityTimelineChartProps
           <div className="flex flex-wrap gap-4 justify-center">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-[hsl(var(--chart-1))]" />
-              <span className="text-sm text-muted-foreground">Applications</span>
+              <span className="text-sm text-muted-foreground">Sourcing</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-[hsl(var(--chart-2))]" />
-              <span className="text-sm text-muted-foreground">Matches</span>
+              <span className="text-sm text-muted-foreground">Matching Preferences</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-[hsl(var(--chart-3))]" />
-              <span className="text-sm text-muted-foreground">Evaluations</span>
+              <span className="text-sm text-muted-foreground">Deployability Check</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-[hsl(var(--chart-4))]" />
-              <span className="text-sm text-muted-foreground">Recommendations</span>
+              <span className="text-sm text-muted-foreground">Verifications</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-[hsl(var(--chart-5))]" />
-              <span className="text-sm text-muted-foreground">Deployments</span>
+              <span className="text-sm text-muted-foreground">Recommendation</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-[hsl(var(--chart-6))]" />
+              <span className="text-sm text-muted-foreground">Putting</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-[hsl(var(--chart-7))]" />
+              <span className="text-sm text-muted-foreground">Deployment</span>
             </div>
           </div>
           

@@ -123,6 +123,18 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
 
   const stageBadgeColor = getStageBadgeColor(opportunity.stage)
 
+  // (Find and update existing mapping/labeling related to stage keys; example uses shown for demonstration)
+  // If need to display badge or label for stages:
+  const stageLabels: Record<string, string> = {
+    sourcing: "Sourcing",
+    matching: "Matching Preferences",
+    deployability: "Deployability Check",
+    verifications: "Verifications",
+    recommendation: "Recommendation",
+    putting: "Putting",
+    deployment: "Deployment",
+  };
+
   return (
     <Link href={`/opportunities/${opportunity.id}`} passHref>
       <Card

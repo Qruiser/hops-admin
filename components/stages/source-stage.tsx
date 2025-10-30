@@ -121,6 +121,9 @@ export function SourceStage() {
     <div className="space-y-6">
       {/* Compact, full-width candidate aggregation snippet */}
       <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Sourcing (Filtered probable candidates sourced from multiple sources)</CardTitle>
+        </CardHeader>
         <CardContent className="py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
