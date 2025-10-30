@@ -22,10 +22,35 @@ export type Opportunity = {
   recommendations: string[]
   description?: string
   requirements?: string[]
+  stages?: {
+    sourcing: { count: number; avgTime: string }
+    matching: { count: number; avgTime: string }
+    deployability: { count: number; avgTime: string }
+    verifications: { count: number; avgTime: string }
+    recommendation: { count: number; avgTime: string }
+    putting: { count: number; avgTime: string }
+    deployment: { count: number; avgTime: string }
+  }
+}
+
+// Helper to generate stages from old fields; Add to every exported Opportunity object
+function withStages(obj: Opportunity): Opportunity {
+  return {
+    ...obj,
+    stages: {
+      sourcing: { count: obj.applications || 0, avgTime: "-" },
+      matching: { count: Math.round((obj.applications || 0) * 0.6), avgTime: "-" },
+      deployability: { count: Math.round((obj.matchPercentage || 0) * 0.1), avgTime: "-" },
+      verifications: { count: (obj.shortlisted || 0), avgTime: "-" },
+      recommendation: { count: (obj.recommended || 0), avgTime: "-" },
+      putting: { count: (obj.shortlisted || 0), avgTime: "-" },
+      deployment: { count: (obj.shortlisted || 0), avgTime: "-" },
+    },
+  }
 }
 
 export const opportunities: Opportunity[] = [
-  {
+  withStages({
     id: "1",
     title: "Senior Frontend Developer",
     company: "TechCorp",
@@ -56,8 +81,8 @@ export const opportunities: Opportunity[] = [
       "Understanding of responsive design principles",
       "Experience with testing frameworks",
     ],
-  },
-  {
+  }),
+  withStages({
     id: "2",
     title: "Product Manager",
     company: "FinanceHub",
@@ -86,8 +111,8 @@ export const opportunities: Opportunity[] = [
       "Experience with agile methodologies",
       "Excellent communication and stakeholder management",
     ],
-  },
-  {
+  }),
+  withStages({
     id: "3",
     title: "DevOps Engineer",
     company: "CloudTech",
@@ -116,8 +141,8 @@ export const opportunities: Opportunity[] = [
       "Experience with cloud providers",
       "Infrastructure as Code (Terraform, Pulumi)",
     ],
-  },
-  {
+  }),
+  withStages({
     id: "4",
     title: "UX Designer",
     company: "CreativeStudio",
@@ -146,8 +171,8 @@ export const opportunities: Opportunity[] = [
       "Proficiency with Figma/Sketch",
       "User research and testing experience",
     ],
-  },
-  {
+  }),
+  withStages({
     id: "5",
     title: "Data Scientist",
     company: "AnalyticsPro",
@@ -176,8 +201,8 @@ export const opportunities: Opportunity[] = [
       "Python, pandas, scikit-learn",
       "Experience deploying models",
     ],
-  },
-  {
+  }),
+  withStages({
     id: "6",
     title: "Senior Backend Engineer",
     company: "TechStartup",
@@ -219,8 +244,8 @@ export const opportunities: Opportunity[] = [
       "Node.js/TypeScript or Go",
       "SQL and NoSQL databases",
     ],
-  },
-  {
+  }),
+  withStages({
     id: "7",
     title: "Head of Engineering",
     company: "ScaleUp",
@@ -258,8 +283,8 @@ export const opportunities: Opportunity[] = [
       "Hiring and org design",
       "Architectural decision-making",
     ],
-  },
-  {
+  }),
+  withStages({
     id: "8",
     title: "Legacy System Maintainer",
     company: "OldTech Corp",
@@ -288,7 +313,7 @@ export const opportunities: Opportunity[] = [
       "Patience and methodical debugging",
       "Clear documentation skills",
     ],
-  },
+  }),
 ]
 
 export function getOpportunityById(id: string): Opportunity | undefined {

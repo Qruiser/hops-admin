@@ -11,8 +11,10 @@ import { CreateOpportunityDialog } from "@/components/create-opportunity-dialog"
 import { FilterDialog } from "@/components/filter-dialog"
 import { CompanyListView } from "@/components/company-list-view"
 import { useHeader } from "@/components/header-context"
+import { useOpportunityTimeline } from "@/hooks/useOpportunityTimeline"
 
 import { opportunities } from "@/data/mock-opportunities"
+import { generateOpportunityTimelinePipelineData, type TimelinePipelineDataPoint } from "@/data/mock-timeline-data"
 
 const companies = [
   {
@@ -170,7 +172,7 @@ export default function OpportunitiesPage() {
       {viewType === "opportunities" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {sortedOpportunities.map((opportunity) => (
-            <OpportunityCard key={opportunity.id} opportunity={opportunity} />
+            <OpportunityCard key={opportunity.id} opportunity={opportunity} timelineData={useOpportunityTimeline(opportunity.id)} />
           ))}
         </div>
       ) : (
