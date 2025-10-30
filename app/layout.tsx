@@ -10,7 +10,7 @@ import { AppLayoutWrapper } from "@/components/app-layout-wrapper"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "HOPS Admin",
+  title: "HOPS",
   description: "Internal operations platform for talent management",
     generator: 'v0.dev'
 }
