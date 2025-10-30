@@ -4,22 +4,13 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceLine } from "recharts"
-import { TrendingUp, ChevronDown, ChevronUp } from "lucide-react"
+import { TrendingUp, ChevronDown, ChevronUp, Users, Star, CheckCircle2, Shield, MessageSquare, UserCheck, Briefcase } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { buildOpportunityLikeFromTimeline, calculateMomentumFromOpportunity, getMomentumDescription } from "@/lib/momentum"
-
-interface TimelineDataPoint {
-  date: string
-  sourcing: number
-  matching: number
-  deployability: number
-  verifications: number
-  recommendation: number
-  putting: number
-  deployment: number
-}
+import type { TimelinePipelineDataPoint } from "@/data/mock-timeline-data"
 
 interface OpportunityTimelineChartProps {
-  data: TimelineDataPoint[]
+  data: TimelinePipelineDataPoint[]
 }
 
 const chartConfig = {
@@ -117,12 +108,31 @@ export function OpportunityTimelineChart({ data }: OpportunityTimelineChartProps
     }
   }
 
+  // Build pretty stages list for collapsed view
+  const stagesPretty = [
+    { key: 'sourcing', label: 'Sourcing', icon: Users },
+    { key: 'matching', label: 'Matching', icon: Star },
+    { key: 'deployability', label: 'Deployability', icon: Briefcase },
+    { key: 'verifications', label: 'Verifications', icon: Shield },
+    { key: 'recommendation', label: 'Recommendation', icon: CheckCircle2 },
+    { key: 'putting', label: 'Putting', icon: MessageSquare },
+    { key: 'deployment', label: 'Deployment', icon: UserCheck },
+  ] as const
+
   // Primary momentum identical to OpportunityCard
   const opportunityLike = buildOpportunityLikeFromTimeline(
     data.map(d => ({ date: d.date, recommendation: d.recommendation }))
   )
   const momentum = calculateMomentumFromOpportunity(opportunityLike)
   const momentumDescriptor = getMomentumDescription(momentum)
+
+  // Progress ring for momentum
+  const ringSize = 120
+  const ringStroke = 10
+  const radius = (ringSize - ringStroke) / 2
+  const circumference = 2 * Math.PI * radius
+  const progress = Math.max(0, Math.min(100, momentum))
+  const dashOffset = circumference - (progress / 100) * circumference
 
   return (
     <Card>
@@ -145,74 +155,72 @@ export function OpportunityTimelineChart({ data }: OpportunityTimelineChartProps
       
       {isCollapsed && (
         <CardContent className="p-6">
-          {/* All metrics on one line with emphasis on velocity */}
-          <div className="flex items-center justify-between gap-8">
-            {/* Primary metric: Momentum score - High visual emphasis */}
-            <div className={`relative px-6 py-4 rounded-xl border-2 shadow-sm transition-all ${
-              momentum >= 80 
-                ? 'border-emerald-300 bg-gradient-to-br from-emerald-50 to-green-50' 
-                : momentum >= 60 
-                ? 'border-blue-300 bg-gradient-to-br from-blue-50 to-cyan-50' 
-                : momentum >= 40 
-                ? 'border-amber-300 bg-gradient-to-br from-amber-50 to-yellow-50' 
-                : 'border-slate-300 bg-gradient-to-br from-slate-50 to-gray-50'
-            }`}>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className={`text-xs font-bold tracking-widest uppercase ${
-                    momentum >= 80 ? 'text-emerald-700' : momentum >= 60 ? 'text-blue-700' : momentum >= 40 ? 'text-amber-700' : 'text-slate-700'
-                  }`}>
-                    Pipeline Velocity
-                  </div>
-                  <div className={`h-2 w-2 rounded-full ${
-                    momentum >= 80 ? 'bg-emerald-500' : momentum >= 60 ? 'bg-blue-500' : momentum >= 40 ? 'bg-amber-500' : 'bg-slate-500'
-                  } animate-pulse`} />
-                </div>
-                <div className="flex items-baseline gap-3">
-                  <div className={`text-6xl font-black tracking-tight drop-shadow-sm ${
-                    momentum >= 80 ? 'text-emerald-600' : momentum >= 60 ? 'text-blue-600' : momentum >= 40 ? 'text-amber-600' : 'text-slate-600'
-                  }`}>
-                    {momentum}
-                  </div>
-                  <div className={`text-sm font-bold px-3 py-1.5 rounded-full shadow-sm ${
-                    momentum >= 80 
-                      ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
-                      : momentum >= 60 
-                      ? 'bg-blue-100 text-blue-800 border border-blue-200' 
-                      : momentum >= 40 
-                      ? 'bg-amber-100 text-amber-800 border border-amber-200' 
-                      : 'bg-slate-100 text-slate-800 border border-slate-200'
-                  }`}>
-                    {momentumDescriptor}
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 mt-1.5">
-                  <div className="h-1 w-1 rounded-full bg-muted-foreground/40" />
-                  <div className="text-xs text-muted-foreground font-medium">from spec to today</div>
+          {/* Enhanced collapsed layout */}
+          <div className="flex flex-col lg:flex-row items-center gap-8">
+            {/* Momentum progress ring */}
+            <div className={`relative rounded-2xl p-4 border ${momentum >= 80 ? 'border-emerald-300 bg-emerald-50/40' : momentum >= 60 ? 'border-blue-300 bg-blue-50/40' : momentum >= 40 ? 'border-amber-300 bg-amber-50/40' : 'border-slate-200 bg-slate-50'}`}>
+              <div className="relative flex flex-col items-center" style={{ width: ringSize, height: ringSize }}>
+                <svg width={ringSize} height={ringSize}>
+                  <circle
+                    cx={ringSize / 2}
+                    cy={ringSize / 2}
+                    r={radius}
+                    stroke="#e5e7eb"
+                    strokeWidth={ringStroke}
+                    fill="none"
+                  />
+                  <circle
+                    cx={ringSize / 2}
+                    cy={ringSize / 2}
+                    r={radius}
+                    stroke={momentum >= 80 ? '#10b981' : momentum >= 60 ? '#3b82f6' : momentum >= 40 ? '#f59e0b' : '#64748b'}
+                    strokeWidth={ringStroke}
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={dashOffset}
+                    transform={`rotate(-90 ${ringSize / 2} ${ringSize / 2})`}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className={`text-5xl font-black ${momentum >= 80 ? 'text-emerald-600' : momentum >= 60 ? 'text-blue-600' : momentum >= 40 ? 'text-amber-600' : 'text-slate-600'}`}>{momentum}</div>
                 </div>
               </div>
+              {/* Descriptor pill/text placed below ring, centered */}
+              <div className="mt-2 flex flex-col items-center">
+                <div className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${momentum >= 80 ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : momentum >= 60 ? 'bg-blue-100 text-blue-800 border-blue-200' : momentum >= 40 ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-slate-100 text-slate-800 border-slate-200'}`}>{momentumDescriptor}</div>
+                <div className="mt-1 text-xs text-muted-foreground">from spec to today</div>
+              </div>
             </div>
-            
-            {/* Secondary synopsis metrics - Inline layout */}
-            <div className="flex items-center gap-8 flex-1 justify-end">
-              {Object.entries(momentumMetrics).map(([key, metric]) => (
-                <div key={key} className="flex flex-col items-center min-w-[70px] group">
-                  <div className="text-3xl font-extrabold text-foreground mb-0.5 group-hover:scale-110 transition-transform">
-                    {metric.current}
-                  </div>
-                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                    {key}
-                  </div>
-                  <div className={`text-xs font-semibold flex items-center gap-1 px-2 py-0.5 rounded-full ${
-                    metric.trend === 'up' 
-                      ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' 
-                      : 'text-red-700 bg-red-50 border border-red-200'
-                  }`}>
-                    {metric.trend === 'up' ? '↗' : '↘'} {Math.abs(metric.change)}
-                  </div>
-                </div>
-              ))}
-            </div>
+
+            {/* Stages metric cards */}
+            <TooltipProvider>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-7 gap-3 w-full">
+                {stagesPretty.map(({ key, label, icon: Icon }) => {
+                  const metric = (momentumMetrics as any)[key]
+                  const colorClasses = metric.trend === 'up'
+                    ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                    : 'text-red-700 bg-red-50 border-red-200'
+
+                  return (
+                    <Tooltip key={key}>
+                      <TooltipTrigger asChild>
+                        <div className="group rounded-xl border bg-background hover:bg-muted/60 transition-colors p-3 flex flex-col items-center text-center cursor-default">
+                          <div className="flex items-center gap-1.5 text-muted-foreground text-xs font-medium uppercase tracking-wide mb-1"><Icon className="h-3.5 w-3.5" /> {label}</div>
+                          <div className="text-2xl font-extrabold text-foreground leading-tight">{metric.current}</div>
+                          <div className={`mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${colorClasses}`}>
+                            {metric.trend === 'up' ? '↗' : '↘'} {Math.abs(metric.change)}
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <div className="text-xs">{label}: {metric.current} (change {metric.trend === 'up' ? '+' : '-'}{Math.abs(metric.change)})</div>
+                      </TooltipContent>
+                    </Tooltip>
+                  )
+                })}
+              </div>
+            </TooltipProvider>
           </div>
         </CardContent>
       )}

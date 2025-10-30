@@ -21,7 +21,7 @@ import {
   Bell,
 } from "lucide-react"
 import Link from "next/link"
-import { calculateMomentumFromOpportunity, getMomentumDescription } from "@/lib/momentum"
+import { calculateMomentumFromOpportunity, getMomentumDescription, buildOpportunityLikeFromTimeline } from "@/lib/momentum"
 import Image from "next/image"
 import {
   DropdownMenu,
@@ -31,12 +31,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import type { Opportunity as OpportunityType } from "@/data/mock-opportunities"
+import type { TimelinePipelineDataPoint } from "@/data/mock-timeline-data"
 
 interface OpportunityCardProps {
   opportunity: OpportunityType
+  timelineData?: TimelinePipelineDataPoint[]
 }
 
-export function OpportunityCard({ opportunity }: OpportunityCardProps) {
+export function OpportunityCard({ opportunity, timelineData }: OpportunityCardProps) {
   const [isLongPressed, setIsLongPressed] = useState(false)
 
   const handleMouseDown = () => {
@@ -47,28 +49,37 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
     return () => clearTimeout(timer)
   }
 
-  const momentum = calculateMomentumFromOpportunity({
-    specCreated: opportunity.specCreated,
-    firstRecommendation: opportunity.firstRecommendation ?? null,
-    lastRecommendation: opportunity.lastRecommendation ?? null,
-    recommendations: opportunity.recommendations ?? [],
-  })
-
-  // Get funny momentum description
-  const getMomentumDescription = (momentum: number) => {
-    if (momentum >= 90) return "Blazing fast"
-    if (momentum >= 80) return "On fire"
-    if (momentum >= 70) return "Cruising"
-    if (momentum >= 60) return "Steady pace"
-    if (momentum >= 50) return "Moving along"
-    if (momentum >= 40) return "Slow and steady"
-    if (momentum >= 30) return "Crawling"
-    if (momentum >= 20) return "Snail's pace"
-    if (momentum >= 10) return "No heartbeat"
-    return "Flatlined"
+  let momentum = 0
+  let momentumDescription = "Flatlined"
+  if (timelineData && timelineData.length > 0) {
+    // Use actual timeline data, just like the page/chart
+    const opportunityLike = buildOpportunityLikeFromTimeline(
+      timelineData.map((d) => ({
+        date: d.date,
+        recommendation: d.recommendation
+      }))
+    )
+    momentum = calculateMomentumFromOpportunity(opportunityLike)
+    momentumDescription = getMomentumDescription(momentum)
+  } else if (
+    opportunity?.stages &&
+    (opportunity.stages.sourcing || opportunity.stages.matching || opportunity.stages.deployability || opportunity.stages.verifications || opportunity.stages.recommendation || opportunity.stages.putting || opportunity.stages.deployment)
+  ) {
+    const pseudoTimeline = [
+      { date: opportunity.lastUpdated, recommendation: opportunity.stages.recommendation?.count || 0 },
+    ]
+    const opportunityLike = buildOpportunityLikeFromTimeline(pseudoTimeline)
+    momentum = calculateMomentumFromOpportunity(opportunityLike)
+    momentumDescription = getMomentumDescription(momentum)
+  } else {
+    momentum = calculateMomentumFromOpportunity({
+      specCreated: opportunity.specCreated,
+      firstRecommendation: opportunity.firstRecommendation ?? null,
+      lastRecommendation: opportunity.lastRecommendation ?? null,
+      recommendations: opportunity.recommendations ?? [],
+    })
+    momentumDescription = getMomentumDescription(momentum)
   }
-
-  const momentumDescription = getMomentumDescription(momentum)
 
   // Get momentum-based styling - minimal approach
   const getMomentumStyle = () => {
@@ -214,24 +225,28 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
             </div>
           </div>
 
-          {/* Minimal Metrics */}
+          {/* Minimal Metrics: new pipeline stages */}
           <div className="grid grid-cols-4 gap-3">
-            <div className="text-center space-y-1">
-              <p className="text-xs font-medium text-muted-foreground">Applications</p>
-              <p className="text-lg font-semibold text-foreground">{opportunity.applications}</p>
-            </div>
-            <div className="text-center space-y-1">
-              <p className="text-xs font-medium text-muted-foreground">Matched</p>
-              <p className="text-lg font-semibold text-foreground">{opportunity.matchPercentage}</p>
-            </div>
-            <div className="text-center space-y-1">
-              <p className="text-xs font-medium text-muted-foreground">Evaluated</p>
-              <p className="text-lg font-semibold text-foreground">{opportunity.shortlisted}</p>
-            </div>
-            <div className="text-center space-y-1">
-              <p className="text-xs font-medium text-muted-foreground">Recommended</p>
-              <p className="text-lg font-semibold text-foreground">{opportunity.recommended}</p>
-            </div>
+            {opportunity.stages && (
+              <>
+                <div className="text-center space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground">Sourcing</p>
+                  <p className="text-lg font-semibold text-foreground">{opportunity.stages.sourcing?.count ?? 0}</p>
+                </div>
+                <div className="text-center space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground">Matching</p>
+                  <p className="text-lg font-semibold text-foreground">{opportunity.stages.matching?.count ?? 0}</p>
+                </div>
+                <div className="text-center space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground">Deployability</p>
+                  <p className="text-lg font-semibold text-foreground">{opportunity.stages.deployability?.count ?? 0}</p>
+                </div>
+                <div className="text-center space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground">Recommendation</p>
+                  <p className="text-lg font-semibold text-foreground">{opportunity.stages.recommendation?.count ?? 0}</p>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Minimal Info Footer */}

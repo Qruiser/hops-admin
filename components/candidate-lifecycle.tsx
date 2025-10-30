@@ -9,22 +9,26 @@ import { ScreeningStage } from "./stages/screening-stage"
 import { MatchStage } from "./stages/match-stage"
 import { RecommendStage } from "./stages/recommend-stage"
 import { DeployStage } from "./stages/deploy-stage"
+import type { TimelinePipelineDataPoint } from "@/data/mock-timeline-data"
 
 interface CandidateLifecycleProps {
   opportunity: any
+  timelineData?: TimelinePipelineDataPoint[]
 }
 
-export function CandidateLifecycle({ opportunity }: CandidateLifecycleProps) {
+export function CandidateLifecycle({ opportunity, timelineData }: CandidateLifecycleProps) {
   const [activeStage, setActiveStage] = useState("sourcing")
 
+  const latest = timelineData && timelineData.length > 0 ? timelineData[timelineData.length - 1] : undefined
+
   const stages = [
-    { id: "sourcing", label: "Sourcing", icon: Users, color: "bg-blue-500", count: opportunity.stages.sourcing?.count ?? 0 },
-    { id: "matching", label: "Matching Preferences", icon: Star, color: "bg-indigo-500", count: opportunity.stages.matching?.count ?? 0 },
-    { id: "deployability", label: "Deployability Check", icon: Briefcase, color: "bg-cyan-500", count: opportunity.stages.deployability?.count ?? 0 },
-    { id: "verifications", label: "Verifications", icon: CheckCircle2, color: "bg-purple-500", count: opportunity.stages.verifications?.count ?? 0 },
-    { id: "recommendation", label: "Recommendation", icon: Star, color: "bg-amber-500", count: opportunity.stages.recommendation?.count ?? 0 },
-    { id: "putting", label: "Putting", icon: Users, color: "bg-pink-500", count: opportunity.stages.putting?.count ?? 0 },
-    { id: "deployment", label: "Deployment", icon: UserCheck, color: "bg-green-500", count: opportunity.stages.deployment?.count ?? 0 },
+    { id: "sourcing", label: "Sourcing", icon: Users, color: "bg-blue-500", count: latest?.sourcing ?? (opportunity.stages.sourcing?.count ?? 0) },
+    { id: "matching", label: "Matching Preferences", icon: Star, color: "bg-indigo-500", count: latest?.matching ?? (opportunity.stages.matching?.count ?? 0) },
+    { id: "deployability", label: "Deployability Check", icon: Briefcase, color: "bg-cyan-500", count: latest?.deployability ?? (opportunity.stages.deployability?.count ?? 0) },
+    { id: "verifications", label: "Verifications", icon: CheckCircle2, color: "bg-purple-500", count: latest?.verifications ?? (opportunity.stages.verifications?.count ?? 0) },
+    { id: "recommendation", label: "Recommendation", icon: Star, color: "bg-amber-500", count: latest?.recommendation ?? (opportunity.stages.recommendation?.count ?? 0) },
+    { id: "putting", label: "Putting", icon: Users, color: "bg-pink-500", count: latest?.putting ?? (opportunity.stages.putting?.count ?? 0) },
+    { id: "deployment", label: "Deployment", icon: UserCheck, color: "bg-green-500", count: latest?.deployment ?? (opportunity.stages.deployment?.count ?? 0) },
   ]
 
   return (

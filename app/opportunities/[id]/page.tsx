@@ -8,7 +8,7 @@ import { CandidateLifecycle } from "@/components/candidate-lifecycle"
 import { OpportunityDetails } from "@/components/opportunity-details"
 import { AnalyticsDashboard } from "@/components/analytics-dashboard"
 import { OpportunityTimelineChart } from "@/components/opportunity-timeline-chart"
-import { generateOpportunityTimelinePipelineData } from "@/data/mock-timeline-data"
+import { useOpportunityTimeline } from "@/hooks/useOpportunityTimeline"
 import { Edit, ArrowLeft, Pause, Play, Archive, Share2, Briefcase, TrendingUp } from "lucide-react"
 import { useHeader } from "@/components/header-context"
 import { getOpportunityById } from "@/data/mock-opportunities"
@@ -38,7 +38,7 @@ export default function OpportunityPage() {
   const [activeTab, setActiveTab] = useState("lifecycle")
   
   // Generate timeline data for the chart (seeded per opportunity)
-  const timelineData = generateOpportunityTimelinePipelineData(opportunityId)
+  const timelineData = useOpportunityTimeline(opportunityId)
 
   // Update the header with opportunity details
   useEffect(() => {
@@ -111,7 +111,7 @@ export default function OpportunityPage() {
         </div>
 
         <TabsContent value="lifecycle" className="mt-4">
-          <CandidateLifecycle opportunity={opportunity} />
+          <CandidateLifecycle opportunity={opportunity} timelineData={timelineData} />
         </TabsContent>
 
         <TabsContent value="details" className="mt-4">
