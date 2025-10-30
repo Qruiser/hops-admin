@@ -124,35 +124,75 @@ export function OpportunityTimelineChart({ data }: OpportunityTimelineChartProps
       </CardHeader>
       
       {isCollapsed && (
-        <CardContent className="p-4">
-          {/* Primary metric: Momentum score */}
-          <div className="mb-4 p-4 rounded-lg border bg-muted/20">
-            <div className="flex items-center justify-between">
-              <div className="text-xs font-medium text-muted-foreground tracking-wide uppercase">Pipeline Velocity</div>
-              <div className="text-xs text-muted-foreground">from spec to today</div>
-            </div>
-            <div className="flex items-end gap-3 mt-2">
-              <div className={`text-5xl font-bold ${momentum >= 80 ? 'text-emerald-600' : momentum >= 60 ? 'text-blue-600' : momentum >= 40 ? 'text-amber-600' : 'text-slate-600'}`}>{momentum}</div>
-              <div className={`text-sm font-medium mb-1 ${momentum >= 80 ? 'text-emerald-600' : momentum >= 60 ? 'text-blue-600' : momentum >= 40 ? 'text-amber-600' : 'text-slate-600'}`}>{momentumDescriptor}</div>
-            </div>
-          </div>
-          {/* Secondary synopsis metrics */}
-          <div className="grid grid-cols-5 gap-4">
-            {Object.entries(momentumMetrics).map(([key, metric]) => (
-              <div key={key} className="text-center">
-                <div className="text-2xl font-bold text-foreground">
-                  {metric.current}
+        <CardContent className="p-6">
+          {/* All metrics on one line with emphasis on velocity */}
+          <div className="flex items-center justify-between gap-8">
+            {/* Primary metric: Momentum score - High visual emphasis */}
+            <div className={`relative px-6 py-4 rounded-xl border-2 shadow-sm transition-all ${
+              momentum >= 80 
+                ? 'border-emerald-300 bg-gradient-to-br from-emerald-50 to-green-50' 
+                : momentum >= 60 
+                ? 'border-blue-300 bg-gradient-to-br from-blue-50 to-cyan-50' 
+                : momentum >= 40 
+                ? 'border-amber-300 bg-gradient-to-br from-amber-50 to-yellow-50' 
+                : 'border-slate-300 bg-gradient-to-br from-slate-50 to-gray-50'
+            }`}>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className={`text-xs font-bold tracking-widest uppercase ${
+                    momentum >= 80 ? 'text-emerald-700' : momentum >= 60 ? 'text-blue-700' : momentum >= 40 ? 'text-amber-700' : 'text-slate-700'
+                  }`}>
+                    Pipeline Velocity
+                  </div>
+                  <div className={`h-2 w-2 rounded-full ${
+                    momentum >= 80 ? 'bg-emerald-500' : momentum >= 60 ? 'bg-blue-500' : momentum >= 40 ? 'bg-amber-500' : 'bg-slate-500'
+                  } animate-pulse`} />
                 </div>
-                <div className="text-xs text-muted-foreground capitalize mb-1">
-                  {key}
+                <div className="flex items-baseline gap-3">
+                  <div className={`text-6xl font-black tracking-tight drop-shadow-sm ${
+                    momentum >= 80 ? 'text-emerald-600' : momentum >= 60 ? 'text-blue-600' : momentum >= 40 ? 'text-amber-600' : 'text-slate-600'
+                  }`}>
+                    {momentum}
+                  </div>
+                  <div className={`text-sm font-bold px-3 py-1.5 rounded-full shadow-sm ${
+                    momentum >= 80 
+                      ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
+                      : momentum >= 60 
+                      ? 'bg-blue-100 text-blue-800 border border-blue-200' 
+                      : momentum >= 40 
+                      ? 'bg-amber-100 text-amber-800 border border-amber-200' 
+                      : 'bg-slate-100 text-slate-800 border border-slate-200'
+                  }`}>
+                    {momentumDescriptor}
+                  </div>
                 </div>
-                <div className={`text-xs flex items-center justify-center gap-1 ${
-                  metric.trend === 'up' ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {metric.trend === 'up' ? '↗' : '↘'} {Math.abs(metric.change)}
+                <div className="flex items-center gap-1.5 mt-1.5">
+                  <div className="h-1 w-1 rounded-full bg-muted-foreground/40" />
+                  <div className="text-xs text-muted-foreground font-medium">from spec to today</div>
                 </div>
               </div>
-            ))}
+            </div>
+            
+            {/* Secondary synopsis metrics - Inline layout */}
+            <div className="flex items-center gap-8 flex-1 justify-end">
+              {Object.entries(momentumMetrics).map(([key, metric]) => (
+                <div key={key} className="flex flex-col items-center min-w-[70px] group">
+                  <div className="text-3xl font-extrabold text-foreground mb-0.5 group-hover:scale-110 transition-transform">
+                    {metric.current}
+                  </div>
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                    {key}
+                  </div>
+                  <div className={`text-xs font-semibold flex items-center gap-1 px-2 py-0.5 rounded-full ${
+                    metric.trend === 'up' 
+                      ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' 
+                      : 'text-red-700 bg-red-50 border border-red-200'
+                  }`}>
+                    {metric.trend === 'up' ? '↗' : '↘'} {Math.abs(metric.change)}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </CardContent>
       )}
