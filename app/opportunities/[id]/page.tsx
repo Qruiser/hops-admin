@@ -11,38 +11,19 @@ import { OpportunityTimelineChart } from "@/components/opportunity-timeline-char
 import { generateOpportunityTimelineData } from "@/data/mock-timeline-data"
 import { Edit, ArrowLeft, Pause, Play, Archive, Share2, Briefcase, TrendingUp } from "lucide-react"
 import { useHeader } from "@/components/header-context"
+import { getOpportunityById } from "@/data/mock-opportunities"
 
 export default function OpportunityPage() {
   const params = useParams()
   const opportunityId = params.id as string
   const { setHeader } = useHeader()
 
-  // In a real app, you would fetch the opportunity details based on the ID
+  // Use shared data to derive the selected opportunity
+  const base = getOpportunityById(opportunityId) ?? getOpportunityById("1")!
   const opportunity = {
+    ...base,
     id: opportunityId,
-    title: "Senior Frontend Developer",
-    company: "TechCorp",
-    companyLogo: "/placeholder.svg?height=40&width=40",
-    workType: "Remote",
-    location: "United States",
-    employmentType: "Full-time",
-    status: "active",
-    isHot: true,
-    isAging: false,
-    applications: 24,
-    matchPercentage: 85,
-    recommended: 6,
-    shortlisted: 3,
-    lastUpdated: "2023-05-15",
-    description:
-      "We are looking for a Senior Frontend Developer to join our team. The ideal candidate will have experience with React, TypeScript, and modern frontend development practices.",
-    requirements: [
-      "5+ years of experience in frontend development",
-      "Strong knowledge of React and TypeScript",
-      "Experience with state management libraries",
-      "Understanding of responsive design principles",
-      "Experience with testing frameworks",
-    ],
+    companyLogo: base.companyLogo || "/placeholder.svg?height=40&width=40",
     stages: {
       source: { count: 24, avgTime: "2 days" },
       screen: { count: 18, avgTime: "3 days" },
@@ -54,8 +35,8 @@ export default function OpportunityPage() {
 
   const [activeTab, setActiveTab] = useState("lifecycle")
   
-  // Generate timeline data for the chart
-  const timelineData = generateOpportunityTimelineData()
+  // Generate timeline data for the chart (seeded per opportunity)
+  const timelineData = generateOpportunityTimelineData(opportunityId)
 
   // Update the header with opportunity details
   useEffect(() => {
@@ -65,7 +46,7 @@ export default function OpportunityPage() {
     return () => {
       setHeader("Recruitment Dashboard", "Manage your recruitment opportunities and candidates")
     }
-  }, [opportunity.title, opportunity.company, opportunity.workType, opportunity.location, setHeader])
+  }, [opportunityId, opportunity.title, opportunity.company, opportunity.workType, opportunity.location, setHeader])
 
   return (
     <div className="w-full p-6 py-8 space-y-6">

@@ -21,6 +21,7 @@ import {
   Bell,
 } from "lucide-react"
 import Link from "next/link"
+import { calculateMomentumFromOpportunity, getMomentumDescription } from "@/lib/momentum"
 import Image from "next/image"
 import {
   DropdownMenu,
@@ -29,31 +30,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import type { Opportunity as OpportunityType } from "@/data/mock-opportunities"
 
 interface OpportunityCardProps {
-  opportunity: {
-    id: string
-    title: string
-    company: string
-    companyLogo: string
-    workType: string
-    location: string
-    employmentType: string
-    status: string
-    stage?: string
-    isHot: boolean
-    isAging: boolean
-    applications: number
-    matchPercentage: number
-    recommended: number
-    shortlisted: number
-    lastUpdated: string
-    notifications: number
-    specCreated: string
-    firstRecommendation?: string | null
-    lastRecommendation?: string | null
-    recommendations: string[]
-  }
+  opportunity: OpportunityType
 }
 
 export function OpportunityCard({ opportunity }: OpportunityCardProps) {
@@ -67,43 +47,12 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
     return () => clearTimeout(timer)
   }
 
-  // Calculate momentum based on time and recommendation velocity
-  const calculateMomentum = () => {
-    const { specCreated, firstRecommendation, lastRecommendation, recommendations } = opportunity
-    const now = new Date()
-    const specDate = new Date(specCreated)
-    const daysSinceSpec = (now.getTime() - specDate.getTime()) / (1000 * 60 * 60 * 24)
-    
-    // If no recommendations yet, return very low momentum
-    if (!firstRecommendation || recommendations.length === 0) {
-      return Math.max(0, 20 - (daysSinceSpec * 2)) // Decay over time
-    }
-    
-    const firstRecDate = new Date(firstRecommendation)
-    const lastRecDate = new Date(lastRecommendation!)
-    
-    // Factor 1: Time to first recommendation (40% weight)
-    // Faster = higher score, max 100 points
-    const timeToFirstRec = (firstRecDate.getTime() - specDate.getTime()) / (1000 * 60 * 60 * 24)
-    const firstRecScore = Math.max(0, 100 - (timeToFirstRec * 4)) // 4 points per day
-    
-    // Factor 2: Recommendation frequency (30% weight)
-    // More recommendations per week = higher score
-    const recFrequency = recommendations.length / Math.max(1, daysSinceSpec) * 7 // per week
-    const frequencyScore = Math.min(100, recFrequency * 20) // 20 points per rec per week
-    
-    // Factor 3: Recent activity (30% weight)
-    // More recent recommendations = higher score
-    const daysSinceLastRec = (now.getTime() - lastRecDate.getTime()) / (1000 * 60 * 60 * 24)
-    const recencyScore = Math.max(0, 100 - (daysSinceLastRec * 10)) // 10 points per day
-    
-    // Composite momentum score
-    const momentum = (firstRecScore * 0.4) + (frequencyScore * 0.3) + (recencyScore * 0.3)
-    
-    return Math.round(Math.max(0, Math.min(100, momentum)))
-  }
-
-  const momentum = calculateMomentum()
+  const momentum = calculateMomentumFromOpportunity({
+    specCreated: opportunity.specCreated,
+    firstRecommendation: opportunity.firstRecommendation ?? null,
+    lastRecommendation: opportunity.lastRecommendation ?? null,
+    recommendations: opportunity.recommendations ?? [],
+  })
 
   // Get funny momentum description
   const getMomentumDescription = (momentum: number) => {
@@ -247,7 +196,7 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
           {/* Momentum - Centerpiece */}
           <div className={`p-8 rounded-lg border-2 ${momentumStyle.borderColor} ${momentumStyle.glow} bg-muted/20`}>
             <div className="text-center space-y-2">
-              <span className="text-xs font-medium text-muted-foreground tracking-wide uppercase">Momentum</span>
+              <span className="text-xs font-medium text-muted-foreground tracking-wide uppercase">Pipeline Velocity</span>
               <p className={`text-6xl font-bold ${momentum >= 80 ? 'text-emerald-600' : momentum >= 60 ? 'text-blue-600' : momentum >= 40 ? 'text-amber-600' : 'text-slate-600'}`}>{momentum}</p>
               <p className={`text-sm font-medium ${momentum >= 80 ? 'text-emerald-600' : momentum >= 60 ? 'text-blue-600' : momentum >= 40 ? 'text-amber-600' : 'text-slate-600'}`}>{momentumDescription}</p>
             </div>

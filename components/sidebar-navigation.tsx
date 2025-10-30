@@ -68,8 +68,8 @@ export function SidebarNavigation() {
   return (
     <div className="flex h-full w-64 flex-col border-r bg-background">
       <div className="flex h-20 items-center border-b px-4">
-        <Link href="/" className="flex items-center gap-2 font-semibold">
-          <span className="text-xl">HOPS Admin</span>
+        <Link href="/" className="flex items-center justify-center w-full gap-2 font-semibold">
+          <span className="text-center text-xl">HOPS</span>
         </Link>
       </div>
       <div className="flex-1 overflow-auto py-2">
