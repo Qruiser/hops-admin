@@ -180,7 +180,7 @@ export function ScreeningStage() {
       <div>
         <Card className="sticky top-6">
           <CardHeader>
-            <CardTitle className="text-lg">Screening Verification</CardTitle>
+            <CardTitle>Deployability Check (Can this candidate do the job?)</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Candidate Details (Collapsible) */}

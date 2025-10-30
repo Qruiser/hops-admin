@@ -427,7 +427,7 @@ export function MatchStage() {
       <div>
         <Card className="sticky top-6">
           <CardHeader>
-            <CardTitle className="text-lg">Q-Factor Analysis</CardTitle>
+            <CardTitle>Matching Preferences (preferences of both parties aligned)</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Compact Candidate Info Panel */}

@@ -172,7 +172,7 @@ export function RecommendStage() {
       <div>
         <Card className="sticky top-6">
           <CardHeader>
-            <CardTitle className="text-lg">Recommendation Status</CardTitle>
+            <CardTitle>Recommendation (Ready to send to client?)</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Compact Candidate Info Panel */}
