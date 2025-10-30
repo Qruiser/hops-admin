@@ -9,7 +9,8 @@ import { OpportunityDetails } from "@/components/opportunity-details"
 import { AnalyticsDashboard } from "@/components/analytics-dashboard"
 import { OpportunityTimelineChart } from "@/components/opportunity-timeline-chart"
 import { useOpportunityTimeline } from "@/hooks/useOpportunityTimeline"
-import { Edit, ArrowLeft, Pause, Play, Archive, Share2, Briefcase, TrendingUp } from "lucide-react"
+import { Edit, ArrowLeft, Pause, Play, Archive, Share2, Briefcase, TrendingUp, Eye, EyeOff, Link2 } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 import { useHeader } from "@/components/header-context"
 import { getOpportunityById } from "@/data/mock-opportunities"
 
@@ -17,6 +18,7 @@ export default function OpportunityPage() {
   const params = useParams()
   const opportunityId = params.id as string
   const { setHeader } = useHeader()
+  const { toast } = useToast()
 
   // Use shared data to derive the selected opportunity
   const base = getOpportunityById(opportunityId) ?? getOpportunityById("1")!
@@ -36,6 +38,7 @@ export default function OpportunityPage() {
   }
 
   const [activeTab, setActiveTab] = useState("lifecycle")
+  const [isPublished, setIsPublished] = useState(true)
   
   // Generate timeline data for the chart (seeded per opportunity)
   const timelineData = useOpportunityTimeline(opportunityId)
@@ -63,7 +66,7 @@ export default function OpportunityPage() {
           <TabsList className="h-10">
             <TabsTrigger value="lifecycle" className="px-4">
               <Briefcase className="h-4 w-4 mr-2" />
-              Candidate Lifecycle
+              Pipeline
             </TabsTrigger>
             <TabsTrigger value="details" className="px-4">
               <Edit className="h-4 w-4 mr-2" />
@@ -82,9 +85,18 @@ export default function OpportunityPage() {
                 Back
               </a>
             </Button>
-            <Button variant="outline">
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
+            <Button variant="outline" onClick={() => setIsPublished((p) => !p)}>
+              {isPublished ? (
+                <>
+                  <EyeOff className="h-4 w-4 mr-2" />
+                  Unpublish
+                </>
+              ) : (
+                <>
+                  <Eye className="h-4 w-4 mr-2" />
+                  Publish
+                </>
+              )}
             </Button>
             <Button variant="outline">
               {opportunity.status === "active" ? (
@@ -102,6 +114,23 @@ export default function OpportunityPage() {
             <Button variant="outline">
               <Share2 className="h-4 w-4 mr-2" />
               Share
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                const origin = typeof window !== "undefined" ? window.location.origin : ""
+                const base = origin || "https://jobs.example.com"
+                const url = `${base}/jobs/${opportunityId}`
+                if (navigator?.clipboard?.writeText) {
+                  navigator.clipboard.writeText(url)
+                  toast({ title: "Link copied", description: url })
+                } else {
+                  toast({ title: "Job URL", description: url })
+                }
+              }}
+            >
+              <Link2 className="h-4 w-4 mr-2" />
+              Link
             </Button>
             <Button variant="outline">
               <Archive className="h-4 w-4 mr-2" />
