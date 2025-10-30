@@ -19,7 +19,7 @@ const chartConfig = {
     color: "hsl(var(--chart-1))",
   },
   matching: {
-    label: "Matching Preferences",
+    label: "Preference Match",
     color: "hsl(var(--chart-2))",
   },
   deployability: {
@@ -347,7 +347,7 @@ export function OpportunityTimelineChart({ data }: OpportunityTimelineChartProps
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-[hsl(var(--chart-2))]" />
-              <span className="text-sm text-muted-foreground">Matching Preferences</span>
+              <span className="text-sm text-muted-foreground">Preferences match</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-[hsl(var(--chart-3))]" />

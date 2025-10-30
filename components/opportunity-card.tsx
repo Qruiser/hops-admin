@@ -138,7 +138,7 @@ export function OpportunityCard({ opportunity, timelineData }: OpportunityCardPr
   // If need to display badge or label for stages:
   const stageLabels: Record<string, string> = {
     sourcing: "Sourcing",
-    matching: "Matching Preferences",
+    matching: "Preferences Match",
     deployability: "Deployability Check",
     verifications: "Verifications",
     recommendation: "Recommendation",
