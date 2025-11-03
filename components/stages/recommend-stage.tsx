@@ -8,6 +8,7 @@ import { ArrowRight, Archive, CheckCircle2, Clock, Calendar, Video, Star, XCircl
 import { CandidateCard } from "../candidate-card"
 import { CandidateInfoPanel } from "../candidate-info-panel"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { AgentSettings, AgentSettingsConfig } from "../agent-settings"
 
 // Sample candidates data
 const candidates = [
@@ -140,9 +141,18 @@ const candidates = [
 
 export function RecommendStage() {
   const [selectedCandidate, setSelectedCandidate] = useState(candidates[0])
+  const [agentConfig, setAgentConfig] = useState<AgentSettingsConfig>({
+    stage: "Recommend",
+    enabled: false,
+    criteria: {},
+  })
 
   const handleSelectCandidate = (candidate: any) => {
     setSelectedCandidate(candidate)
+  }
+
+  const handleAgentUpdate = (config: AgentSettingsConfig) => {
+    setAgentConfig(config)
   }
 
   const formatDate = (dateString: string) => {
@@ -154,9 +164,15 @@ export function RecommendStage() {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="space-y-6">
+      {/* Agent Settings */}
+      <div className="flex justify-end">
+        <AgentSettings config={agentConfig} onUpdate={handleAgentUpdate} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {candidates.map((candidate) => (
             <div
               key={candidate.id}
@@ -393,6 +409,7 @@ export function RecommendStage() {
           </CardContent>
         </Card>
       </div>
+    </div>
     </div>
   )
 }

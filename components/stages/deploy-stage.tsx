@@ -26,6 +26,7 @@ import { CandidateInfoPanel } from "../candidate-info-panel"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { AgentSettings, AgentSettingsConfig } from "../agent-settings"
 
 // Sample candidates data
 const candidates = [
@@ -263,9 +264,18 @@ function FinanceDetailsDialog({
 
 export function DeployStage() {
   const [selectedCandidate, setSelectedCandidate] = useState(candidates[0])
+  const [agentConfig, setAgentConfig] = useState<AgentSettingsConfig>({
+    stage: "Deploy",
+    enabled: false,
+    criteria: {},
+  })
 
   const handleSelectCandidate = (candidate: any) => {
     setSelectedCandidate(candidate)
+  }
+
+  const handleAgentUpdate = (config: AgentSettingsConfig) => {
+    setAgentConfig(config)
   }
 
   // Calculate deployment progress
@@ -280,9 +290,15 @@ export function DeployStage() {
   const isNotStarted = progress === 0
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="space-y-6">
+      {/* Agent Settings */}
+      <div className="flex justify-end">
+        <AgentSettings config={agentConfig} onUpdate={handleAgentUpdate} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {candidates.map((candidate) => (
             <div
               key={candidate.id}
@@ -488,6 +504,7 @@ export function DeployStage() {
           </CardContent>
         </Card>
       </div>
+    </div>
     </div>
   )
 }
