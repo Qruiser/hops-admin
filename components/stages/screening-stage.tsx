@@ -24,6 +24,7 @@ import {
 import { CandidateCard } from "../candidate-card"
 import { CandidateInfoPanel } from "../candidate-info-panel"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { AgentSettings, AgentSettingsConfig } from "../agent-settings"
 
 // Sample candidates data
 const candidates = [
@@ -101,9 +102,22 @@ export function ScreeningStage() {
   const [selectedCandidate, setSelectedCandidate] = useState(candidates[0])
   const [showCandidateDetails, setShowCandidateDetails] = useState(true)
   const [candidatesData, setCandidatesData] = useState(candidates)
+  const [agentConfig, setAgentConfig] = useState<AgentSettingsConfig>({
+    stage: "Screening",
+    enabled: true,
+    criteria: {
+      jobConsistency: true,
+      salaryMatch: true,
+      contractOpenness: true,
+    },
+  })
 
   const handleSelectCandidate = (candidate: any) => {
     setSelectedCandidate(candidate)
+  }
+
+  const handleAgentUpdate = (config: AgentSettingsConfig) => {
+    setAgentConfig(config)
   }
 
   const handleSetupCall = () => {
@@ -162,9 +176,15 @@ export function ScreeningStage() {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="space-y-6">
+      {/* Agent Settings */}
+      <div className="flex justify-end">
+        <AgentSettings config={agentConfig} onUpdate={handleAgentUpdate} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {candidatesData.map((candidate) => (
             <div
               key={candidate.id}
@@ -414,6 +434,7 @@ export function ScreeningStage() {
           </CardContent>
         </Card>
       </div>
+    </div>
     </div>
   )
 }

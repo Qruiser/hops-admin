@@ -19,6 +19,7 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { CandidateCard } from "../candidate-card"
 import { CandidateScoringPanel } from "../candidate-scoring-panel"
+import { AgentSettings, AgentSettingsConfig } from "../agent-settings"
 
 // Sample candidates data
 const candidates = [
@@ -107,6 +108,21 @@ const candidates = [
 export function SourceStage() {
   const [selectedCandidate, setSelectedCandidate] = useState<any>(null)
   const [isPanelOpen, setIsPanelOpen] = useState(false)
+  
+  // Agent settings configuration
+  const [agentConfig, setAgentConfig] = useState<AgentSettingsConfig>({
+    stage: "Sourcing",
+    enabled: true,
+    criteria: {
+      gatherFromExistingDB: true,
+      checkMatchingSkills: true,
+      checkMatchingFrameworks: true,
+      checkJobConsistency: true,
+      matchSalaryRange: true,
+      checkContractOpenness: true,
+      locationBasedExperience: true,
+    },
+  })
 
   const handleSelectCandidate = (candidate: any) => {
     setSelectedCandidate(candidate)
@@ -117,8 +133,17 @@ export function SourceStage() {
     setIsPanelOpen(false)
   }
 
+  const handleAgentUpdate = (config: AgentSettingsConfig) => {
+    setAgentConfig(config)
+  }
+
   return (
     <div className="space-y-6">
+      {/* Agent Settings */}
+      <div className="flex justify-end">
+        <AgentSettings config={agentConfig} onUpdate={handleAgentUpdate} />
+      </div>
+
       {/* Compact, full-width candidate aggregation snippet */}
       <Card className="w-full">
         <CardContent className="py-3">
