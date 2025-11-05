@@ -267,7 +267,8 @@ export function DeployStage() {
   const [agentConfig, setAgentConfig] = useState<AgentSettingsConfig>({
     stage: "Deploy",
     enabled: false,
-    criteria: {},
+    stageLevelAgents: [],
+    candidateLevelAgents: [],
   })
 
   const handleSelectCandidate = (candidate: any) => {

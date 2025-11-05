@@ -117,15 +117,28 @@ export function SourceStage() {
   const [agentConfig, setAgentConfig] = useState<AgentSettingsConfig>({
     stage: "Sourcing",
     enabled: true,
-    criteria: {
-      gatherFromExistingDB: true,
-      checkMatchingSkills: true,
-      checkMatchingFrameworks: true,
-      checkJobConsistency: true,
-      matchSalaryRange: true,
-      checkContractOpenness: true,
-      locationBasedExperience: true,
-    },
+    stageLevelAgents: [
+      {
+        id: "fetch-internal-db-1",
+        name: "Fetch from Internal Database",
+        enabled: true,
+        type: "stage-level",
+      },
+    ],
+    candidateLevelAgents: [
+      {
+        id: "check-matching-skills-1",
+        name: "Check Matching Skills",
+        enabled: true,
+        type: "candidate-level",
+      },
+      {
+        id: "match-salary-range-1",
+        name: "Match Salary Range",
+        enabled: true,
+        type: "candidate-level",
+      },
+    ],
   })
 
   // Filter candidates based on selected source

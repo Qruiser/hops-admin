@@ -407,15 +407,33 @@ export function MatchStage() {
   const [agentConfig, setAgentConfig] = useState<AgentSettingsConfig>({
     stage: "Match",
     enabled: true,
-    criteria: {
-      candidateInterested: true,
-      preferencesMatch: true,
-      withinBudget: true,
-      valueForMoney: true,
-      skillLevelMatch: true,
-      relevantCVInfo: true,
-      availableImmediately: true,
-    },
+    stageLevelAgents: [],
+    candidateLevelAgents: [
+      {
+        id: "candidate-interest-1",
+        name: "Check Candidate Interest",
+        enabled: true,
+        type: "candidate-level",
+      },
+      {
+        id: "preferences-match-1",
+        name: "Check Preferences Match",
+        enabled: true,
+        type: "candidate-level",
+      },
+      {
+        id: "within-budget-1",
+        name: "Check Within Budget",
+        enabled: true,
+        type: "candidate-level",
+      },
+      {
+        id: "skill-level-match-1",
+        name: "Check Skill Level Match",
+        enabled: true,
+        type: "candidate-level",
+      },
+    ],
   })
 
   const handleSelectCandidate = (candidate: any) => {

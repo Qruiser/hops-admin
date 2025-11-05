@@ -9,7 +9,7 @@ import { OpportunityDetails } from "@/components/opportunity-details"
 import { AnalyticsDashboard } from "@/components/analytics-dashboard"
 import { OpportunityTimelineChart } from "@/components/opportunity-timeline-chart"
 import { useOpportunityTimeline } from "@/hooks/useOpportunityTimeline"
-import { Edit, ArrowLeft, Pause, Play, Archive, Share2, Briefcase, TrendingUp, Eye, EyeOff, Link2 } from "lucide-react"
+import { Edit, Pause, Play, Archive, Share2, Briefcase, TrendingUp, Eye, EyeOff, Link2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useHeader } from "@/components/header-context"
 import { getOpportunityById } from "@/data/mock-opportunities"
@@ -45,7 +45,7 @@ export default function OpportunityPage() {
 
   // Update the header with opportunity details
   useEffect(() => {
-    setHeader(opportunity.title, `${opportunity.company} • ${opportunity.workType} • ${opportunity.location}`)
+    setHeader(opportunity.title, `${opportunity.company} • ${opportunity.workType} • ${opportunity.location}`, "/opportunities")
     
     // Cleanup: reset to default when component unmounts
     return () => {
@@ -74,11 +74,9 @@ export default function OpportunityPage() {
             </TabsList>
 
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" asChild>
-                <a href="/">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back
-                </a>
+              <Button variant="outline">
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
               </Button>
               <Button variant="outline" onClick={() => setIsPublished((p) => !p)}>
                 {isPublished ? (

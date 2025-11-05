@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Settings, CheckCircle2 } from "lucide-react"
+import { Settings, CheckCircle2, Plus, Trash2, Layers, Users, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -17,14 +17,193 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
-// Base agent settings interface
+// Agent type definitions
+export type AgentType = "stage-level" | "candidate-level"
+
+// Stage-level agent configuration
+export interface StageLevelAgent {
+  id: string
+  name: string
+  enabled: boolean
+  type: "stage-level"
+  config?: Record<string, any>
+}
+
+// Candidate-level agent configuration
+export interface CandidateLevelAgent {
+  id: string
+  name: string
+  enabled: boolean
+  type: "candidate-level"
+  config?: Record<string, any>
+}
+
+export type Agent = StageLevelAgent | CandidateLevelAgent
+
+// New agent settings configuration
+export interface AgentSettingsConfig {
+  stage: string
+  enabled: boolean
+  stageLevelAgents: StageLevelAgent[]
+  candidateLevelAgents: CandidateLevelAgent[]
+}
+
+// Available agent templates by stage
+export interface AgentTemplate {
+  id: string
+  name: string
+  description: string
+  type: AgentType
+  defaultConfig?: Record<string, any>
+}
+
+// Predefined agent templates for each stage
+const getAgentTemplates = (stage: string): AgentTemplate[] => {
+  const stageLower = stage.toLowerCase()
+  
+  if (stageLower === "sourcing") {
+    return [
+      {
+        id: "fetch-linkedin",
+        name: "Fetch from LinkedIn",
+        description: "Retrieve candidates from LinkedIn based on job requirements",
+        type: "stage-level",
+      },
+      {
+        id: "fetch-internal-db",
+        name: "Fetch from Internal Database",
+        description: "Collect potential candidates from internal database",
+        type: "stage-level",
+      },
+      {
+        id: "fetch-website",
+        name: "Fetch from Website",
+        description: "Gather candidates who applied through company website",
+        type: "stage-level",
+      },
+      {
+        id: "check-matching-skills",
+        name: "Check Matching Skills",
+        description: "Verify candidate skills align with job requirements",
+        type: "candidate-level",
+      },
+      {
+        id: "check-matching-frameworks",
+        name: "Check Matching Frameworks",
+        description: "Ensure candidate experience with required frameworks",
+        type: "candidate-level",
+      },
+      {
+        id: "check-job-consistency",
+        name: "Check Job Consistency",
+        description: "Analyze long-term vs short-term employment patterns",
+        type: "candidate-level",
+      },
+      {
+        id: "match-salary-range",
+        name: "Match Salary Range",
+        description: "Verify candidate expectations within budget",
+        type: "candidate-level",
+      },
+      {
+        id: "check-contract-openness",
+        name: "Check Contract Openness",
+        description: "Confirm willingness for contract/freelance work",
+        type: "candidate-level",
+      },
+      {
+        id: "location-based-experience",
+        name: "Location-Based Experience",
+        description: "Adjust experience requirements based on location",
+        type: "candidate-level",
+      },
+    ]
+  } else if (stageLower === "match" || stageLower === "matching") {
+    return [
+      {
+        id: "candidate-interest",
+        name: "Check Candidate Interest",
+        description: "Is candidate interested in the job and company?",
+        type: "candidate-level",
+      },
+      {
+        id: "preferences-match",
+        name: "Check Preferences Match",
+        description: "Candidate preferences align with client requirements",
+        type: "candidate-level",
+      },
+      {
+        id: "within-budget",
+        name: "Check Within Budget",
+        description: "Candidate asking range is within company's budget",
+        type: "candidate-level",
+      },
+      {
+        id: "value-for-money",
+        name: "Check Value for Money",
+        description: "Is the asking rate value for money?",
+        type: "candidate-level",
+      },
+      {
+        id: "skill-level-match",
+        name: "Check Skill Level Match",
+        description: "Base check - is there a skill level match with the opportunity",
+        type: "candidate-level",
+      },
+      {
+        id: "relevant-cv-info",
+        name: "Check Relevant CV Information",
+        description: "Is there relevant information in the CV that matches with the opportunity",
+        type: "candidate-level",
+      },
+      {
+        id: "available-immediately",
+        name: "Check Available Immediately",
+        description: "Readiness - Is candidate available to start immediately?",
+        type: "candidate-level",
+      },
+    ]
+  } else if (stageLower === "screening" || stageLower === "deployability") {
+    return [
+      {
+        id: "job-consistency",
+        name: "Check Job Consistency",
+        description: "Check for consistency in terms of long-term/short-term employment",
+        type: "candidate-level",
+      },
+      {
+        id: "salary-match",
+        name: "Check Salary Match",
+        description: "Verify candidate expectations are within budget",
+        type: "candidate-level",
+      },
+      {
+        id: "contract-openness",
+        name: "Check Contract Openness",
+        description: "Confirm willingness for contract work",
+        type: "candidate-level",
+      },
+    ]
+  }
+  
+  return []
+}
+
+// Legacy interfaces for backward compatibility (if needed)
 export interface BaseAgentSettingsConfig {
   stage: string
   enabled: boolean
 }
 
-// Sourcing Stage specific criteria
 export interface SourcingCriteria {
   gatherFromExistingDB: boolean
   checkMatchingSkills: boolean
@@ -35,7 +214,6 @@ export interface SourcingCriteria {
   locationBasedExperience: boolean
 }
 
-// Match Stage specific criteria
 export interface MatchCriteria {
   candidateInterested: boolean
   preferencesMatch: boolean
@@ -46,29 +224,11 @@ export interface MatchCriteria {
   availableImmediately: boolean
 }
 
-// Screening Stage specific criteria  
 export interface ScreeningCriteria {
   jobConsistency: boolean
   salaryMatch: boolean
   contractOpenness: boolean
 }
-
-// Recommend Stage specific criteria
-export interface RecommendCriteria {
-  // Can be empty or have specific criteria
-}
-
-// Deploy Stage specific criteria
-export interface DeployCriteria {
-  // Can be empty or have specific criteria
-}
-
-export type AgentSettingsConfig = 
-  | (BaseAgentSettingsConfig & { criteria: SourcingCriteria; thresholds?: any; locationSettings?: any })
-  | (BaseAgentSettingsConfig & { criteria: MatchCriteria })
-  | (BaseAgentSettingsConfig & { criteria: ScreeningCriteria })
-  | (BaseAgentSettingsConfig & { criteria: RecommendCriteria })
-  | (BaseAgentSettingsConfig & { criteria: DeployCriteria })
 
 interface AgentSettingsProps {
   config: AgentSettingsConfig
@@ -78,6 +238,7 @@ interface AgentSettingsProps {
 export function AgentSettings({ config, onUpdate }: AgentSettingsProps) {
   const [open, setOpen] = useState(false)
   const [localConfig, setLocalConfig] = useState(config)
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("")
 
   const handleEnableToggle = () => {
     const updatedConfig = { ...localConfig, enabled: !localConfig.enabled }
@@ -85,298 +246,135 @@ export function AgentSettings({ config, onUpdate }: AgentSettingsProps) {
     onUpdate(updatedConfig)
   }
 
-  const activeCriteriaCount = Object.values(localConfig.criteria).filter(Boolean).length
-
-  const renderCriteria = () => {
-    const stage = config.stage.toLowerCase()
+  const handleAgentToggle = (agentId: string, type: AgentType) => {
+    const updatedConfig = { ...localConfig }
     
-    if (stage === "sourcing") {
-      return renderSourcingCriteria()
-    } else if (stage === "match" || stage === "matching") {
-      return renderMatchCriteria()
-    } else if (stage === "screening" || stage === "deployability") {
-      return renderScreeningCriteria()
-    } else if (stage === "recommend") {
-      return renderRecommendCriteria()
-    } else if (stage === "deploy") {
-      return renderDeployCriteria()
+    if (type === "stage-level") {
+      updatedConfig.stageLevelAgents = updatedConfig.stageLevelAgents.map(agent =>
+        agent.id === agentId ? { ...agent, enabled: !agent.enabled } : agent
+      )
+    } else {
+      updatedConfig.candidateLevelAgents = updatedConfig.candidateLevelAgents.map(agent =>
+        agent.id === agentId ? { ...agent, enabled: !agent.enabled } : agent
+      )
     }
     
-    return null
+    setLocalConfig(updatedConfig)
+    onUpdate(updatedConfig)
   }
 
-  const renderSourcingCriteria = () => {
-    const criteria = localConfig.criteria as SourcingCriteria
+  const handleAddAgent = () => {
+    if (!selectedTemplateId) return
     
-    const handleToggle = (field: keyof SourcingCriteria) => {
-      const updatedCriteria = {
-        ...criteria,
-        [field]: !criteria[field],
-      }
-      const updatedConfig = { ...localConfig, criteria: updatedCriteria }
-      setLocalConfig(updatedConfig)
-      onUpdate(updatedConfig)
+    const templates = getAgentTemplates(localConfig.stage)
+    const template = templates.find(t => t.id === selectedTemplateId)
+    if (!template) return
+
+    const newAgent: Agent = {
+      id: `${template.id}-${Date.now()}`,
+      name: template.name,
+      enabled: true,
+      type: template.type,
+      config: template.defaultConfig || {},
     }
 
-    return (
-      <>
-        <Separator />
-        <div className="space-y-4">
-          <h3 className="text-sm font-semibold uppercase tracking-wide">Gathering Criteria</h3>
-          
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex-1">
-                <Label className="text-sm font-medium">Gather from Existing DB</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Collect potential candidates from internal database
-                </p>
-              </div>
-              <Switch checked={criteria.gatherFromExistingDB} onCheckedChange={() => handleToggle("gatherFromExistingDB")} />
-            </div>
+    const updatedConfig = { ...localConfig }
+    if (template.type === "stage-level") {
+      updatedConfig.stageLevelAgents = [...updatedConfig.stageLevelAgents, newAgent as StageLevelAgent]
+    } else {
+      updatedConfig.candidateLevelAgents = [...updatedConfig.candidateLevelAgents, newAgent as CandidateLevelAgent]
+    }
+    
+    setLocalConfig(updatedConfig)
+    onUpdate(updatedConfig)
+    setSelectedTemplateId("")
+  }
 
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex-1">
-                <Label className="text-sm font-medium">Check Matching Skills</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Verify candidate skills align with job requirements
-                </p>
-              </div>
-              <Switch checked={criteria.checkMatchingSkills} onCheckedChange={() => handleToggle("checkMatchingSkills")} />
-            </div>
+  const handleRemoveAgent = (agentId: string, type: AgentType) => {
+    const updatedConfig = { ...localConfig }
+    
+    if (type === "stage-level") {
+      updatedConfig.stageLevelAgents = updatedConfig.stageLevelAgents.filter(agent => agent.id !== agentId)
+    } else {
+      updatedConfig.candidateLevelAgents = updatedConfig.candidateLevelAgents.filter(agent => agent.id !== agentId)
+    }
+    
+    setLocalConfig(updatedConfig)
+    onUpdate(updatedConfig)
+  }
 
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex-1">
-                <Label className="text-sm font-medium">Check Matching Frameworks</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Ensure candidate experience with required frameworks
-                </p>
-              </div>
-              <Switch checked={criteria.checkMatchingFrameworks} onCheckedChange={() => handleToggle("checkMatchingFrameworks")} />
-            </div>
+  const activeStageAgents = localConfig.stageLevelAgents.filter(a => a.enabled).length
+  const activeCandidateAgents = localConfig.candidateLevelAgents.filter(a => a.enabled).length
+  const totalActiveAgents = activeStageAgents + activeCandidateAgents
 
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex-1">
-                <Label className="text-sm font-medium">Check Job Consistency</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Analyze long-term vs short-term employment patterns
-                </p>
-              </div>
-              <Switch checked={criteria.checkJobConsistency} onCheckedChange={() => handleToggle("checkJobConsistency")} />
-            </div>
+  const templates = getAgentTemplates(localConfig.stage)
+  const availableTemplates = templates.filter(template => {
+    const existingIds = [
+      ...localConfig.stageLevelAgents.map(a => {
+        // Extract base template ID (remove timestamp suffix)
+        const parts = a.id.split('-')
+        return parts.slice(0, -1).join('-')
+      }),
+      ...localConfig.candidateLevelAgents.map(a => {
+        // Extract base template ID (remove timestamp suffix)
+        const parts = a.id.split('-')
+        return parts.slice(0, -1).join('-')
+      })
+    ]
+    return !existingIds.includes(template.id)
+  })
 
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex-1">
-                <Label className="text-sm font-medium">Match Salary Range</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Verify candidate expectations within budget
-                </p>
-              </div>
-              <Switch checked={criteria.matchSalaryRange} onCheckedChange={() => handleToggle("matchSalaryRange")} />
-            </div>
-
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex-1">
-                <Label className="text-sm font-medium">Check Contract Openness</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Confirm willingness for contract/freelance work
-                </p>
-              </div>
-              <Switch checked={criteria.checkContractOpenness} onCheckedChange={() => handleToggle("checkContractOpenness")} />
-            </div>
-
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex-1">
-                <Label className="text-sm font-medium">Location-Based Experience</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Adjust experience requirements based on location
-                </p>
-              </div>
-              <Switch checked={criteria.locationBasedExperience} onCheckedChange={() => handleToggle("locationBasedExperience")} />
-            </div>
-          </div>
+  const renderAgentList = (agents: Agent[], type: AgentType) => {
+    if (agents.length === 0) {
+      return (
+        <div className="p-4 border rounded-lg text-center text-muted-foreground">
+          <p className="text-sm">No {type === "stage-level" ? "stage-level" : "candidate-level"} agents configured.</p>
+          <p className="text-xs mt-1">Add agents using the dropdown above.</p>
         </div>
-      </>
-    )
-  }
-
-  const renderMatchCriteria = () => {
-    const criteria = localConfig.criteria as MatchCriteria
-    
-    const handleToggle = (field: keyof MatchCriteria) => {
-      const updatedCriteria = {
-        ...criteria,
-        [field]: !criteria[field],
-      }
-      const updatedConfig = { ...localConfig, criteria: updatedCriteria }
-      setLocalConfig(updatedConfig)
-      onUpdate(updatedConfig)
+      )
     }
 
     return (
-      <>
-        <Separator />
-        <div className="space-y-4">
-          <h3 className="text-sm font-semibold uppercase tracking-wide">Match Criteria</h3>
-          
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 border rounded-lg">
+      <div className="space-y-3">
+        {agents.map((agent) => {
+          // Find template by matching base ID
+          const agentBaseId = agent.id.split('-').slice(0, -1).join('-')
+          const template = templates.find(t => t.id === agentBaseId)
+          return (
+            <div key={agent.id} className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex-1">
-                <Label className="text-sm font-medium">Candidate Interest</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Is candidate interested in the job and company?
-                </p>
+                <div className="flex items-center gap-2">
+                  <Label className="text-sm font-medium">{agent.name}</Label>
+                  {agent.enabled && (
+                    <Badge variant="secondary" className="text-xs">
+                      Active
+                    </Badge>
+                  )}
+                </div>
+                {template && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {template.description}
+                  </p>
+                )}
               </div>
-              <Switch checked={criteria.candidateInterested} onCheckedChange={() => handleToggle("candidateInterested")} />
-            </div>
-
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex-1">
-                <Label className="text-sm font-medium">Preferences Match</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Candidate preferences align with client requirements
-                </p>
+              <div className="flex items-center gap-2">
+                <Switch 
+                  checked={agent.enabled} 
+                  onCheckedChange={() => handleAgentToggle(agent.id, type)} 
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  onClick={() => handleRemoveAgent(agent.id, type)}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
               </div>
-              <Switch checked={criteria.preferencesMatch} onCheckedChange={() => handleToggle("preferencesMatch")} />
             </div>
-
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex-1">
-                <Label className="text-sm font-medium">Within Budget</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Candidate asking range is within company's budget
-                </p>
-              </div>
-              <Switch checked={criteria.withinBudget} onCheckedChange={() => handleToggle("withinBudget")} />
-            </div>
-
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex-1">
-                <Label className="text-sm font-medium">Value for Money</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Is the asking rate value for money?
-                </p>
-              </div>
-              <Switch checked={criteria.valueForMoney} onCheckedChange={() => handleToggle("valueForMoney")} />
-            </div>
-
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex-1">
-                <Label className="text-sm font-medium">Skill Level Match</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Base check - is there a skill level match with the opportunity
-                </p>
-              </div>
-              <Switch checked={criteria.skillLevelMatch} onCheckedChange={() => handleToggle("skillLevelMatch")} />
-            </div>
-
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex-1">
-                <Label className="text-sm font-medium">Relevant CV Information</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Is there relevant information in the CV that matches with the opportunity
-                </p>
-              </div>
-              <Switch checked={criteria.relevantCVInfo} onCheckedChange={() => handleToggle("relevantCVInfo")} />
-            </div>
-
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex-1">
-                <Label className="text-sm font-medium">Available Immediately</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Readiness - Is candidate available to start immediately?
-                </p>
-              </div>
-              <Switch checked={criteria.availableImmediately} onCheckedChange={() => handleToggle("availableImmediately")} />
-            </div>
-          </div>
-        </div>
-      </>
-    )
-  }
-
-  const renderScreeningCriteria = () => {
-    const criteria = localConfig.criteria as ScreeningCriteria
-    
-    const handleToggle = (field: keyof ScreeningCriteria) => {
-      const updatedCriteria = {
-        ...criteria,
-        [field]: !criteria[field],
-      }
-      const updatedConfig = { ...localConfig, criteria: updatedCriteria }
-      setLocalConfig(updatedConfig)
-      onUpdate(updatedConfig)
-    }
-
-    return (
-      <>
-        <Separator />
-        <div className="space-y-4">
-          <h3 className="text-sm font-semibold uppercase tracking-wide">Screening Criteria</h3>
-          
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex-1">
-                <Label className="text-sm font-medium">Job Consistency</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Check for consistency in terms of long-term/short-term employment
-                </p>
-              </div>
-              <Switch checked={criteria.jobConsistency} onCheckedChange={() => handleToggle("jobConsistency")} />
-            </div>
-
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex-1">
-                <Label className="text-sm font-medium">Salary Match</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Verify candidate expectations are within budget
-                </p>
-              </div>
-              <Switch checked={criteria.salaryMatch} onCheckedChange={() => handleToggle("salaryMatch")} />
-            </div>
-
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex-1">
-                <Label className="text-sm font-medium">Contract Openness</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Confirm willingness for contract work
-                </p>
-              </div>
-              <Switch checked={criteria.contractOpenness} onCheckedChange={() => handleToggle("contractOpenness")} />
-            </div>
-          </div>
-        </div>
-      </>
-    )
-  }
-
-  const renderRecommendCriteria = () => {
-    return (
-      <>
-        <Separator />
-        <div className="space-y-4">
-          <h3 className="text-sm font-semibold uppercase tracking-wide">Recommendation Criteria</h3>
-          <div className="p-4 border rounded-lg text-center text-muted-foreground">
-            <p className="text-sm">No automated criteria configured for this stage.</p>
-            <p className="text-xs mt-1">Candidates are reviewed manually before being sent to clients.</p>
-          </div>
-        </div>
-      </>
-    )
-  }
-
-  const renderDeployCriteria = () => {
-    return (
-      <>
-        <Separator />
-        <div className="space-y-4">
-          <h3 className="text-sm font-semibold uppercase tracking-wide">Deployment Criteria</h3>
-          <div className="p-4 border rounded-lg text-center text-muted-foreground">
-            <p className="text-sm">No automated criteria configured for this stage.</p>
-            <p className="text-xs mt-1">Focus is on documentation, contracts, and onboarding process.</p>
-          </div>
-        </div>
-      </>
+          )
+        })}
+      </div>
     )
   }
 
@@ -386,21 +384,21 @@ export function AgentSettings({ config, onUpdate }: AgentSettingsProps) {
         <Button variant="outline" size="sm" className="gap-2">
           <Settings className="h-4 w-4" />
           Agent Settings
-          {localConfig.enabled && (
+          {localConfig.enabled && totalActiveAgents > 0 && (
             <Badge variant="secondary" className="ml-1">
-              {activeCriteriaCount} active
+              {totalActiveAgents} active
             </Badge>
           )}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings className="h-5 w-5" />
             Agent Settings - {localConfig.stage}
           </DialogTitle>
           <DialogDescription>
-            Configure automated criteria for candidate evaluation in the {localConfig.stage} stage
+            Configure automated agents for the {localConfig.stage} stage. Stage-level agents manage the entire workflow, while candidate-level agents run for each candidate.
           </DialogDescription>
         </DialogHeader>
 
@@ -409,10 +407,10 @@ export function AgentSettings({ config, onUpdate }: AgentSettingsProps) {
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div>
               <Label htmlFor="enable-agent" className="text-base font-medium">
-                Enable Agent
+                Enable Agent System
               </Label>
               <p className="text-sm text-muted-foreground mt-1">
-                Turn on automated candidate filtering for this stage
+                Turn on automated agents for this stage
               </p>
             </div>
             <Switch id="enable-agent" checked={localConfig.enabled} onCheckedChange={handleEnableToggle} />
@@ -420,27 +418,121 @@ export function AgentSettings({ config, onUpdate }: AgentSettingsProps) {
 
           {localConfig.enabled && (
             <>
-              {renderCriteria()}
+              {/* Add Agent Section */}
+              {availableTemplates.length > 0 && (
+                <div className="p-4 border rounded-lg bg-muted/50">
+                  <Label className="text-sm font-semibold mb-3 block">Add New Agent</Label>
+                  <div className="flex gap-2">
+                    <Select value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
+                      <SelectTrigger className="flex-1">
+                        <SelectValue placeholder="Select an agent template..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableTemplates.map((template) => (
+                          <SelectItem key={template.id} value={template.id}>
+                            <div className="flex items-center gap-2">
+                              {template.type === "stage-level" ? (
+                                <Layers className="h-4 w-4 text-blue-600" />
+                              ) : (
+                                <Users className="h-4 w-4 text-green-600" />
+                              )}
+                              <div>
+                                <div className="font-medium">{template.name}</div>
+                                <div className="text-xs text-muted-foreground">{template.description}</div>
+                              </div>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button 
+                      onClick={handleAddAgent} 
+                      disabled={!selectedTemplateId}
+                      className="gap-2"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Stage-Level Agents Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Layers className="h-5 w-5 text-blue-600" />
+                  <div>
+                    <h3 className="text-base font-semibold">Stage-Level Agents</h3>
+                    <p className="text-xs text-muted-foreground">
+                      Agents that manage the entire stage workflow (e.g., fetching candidates from sources)
+                    </p>
+                  </div>
+                  {activeStageAgents > 0 && (
+                    <Badge variant="secondary" className="ml-auto">
+                      {activeStageAgents} active
+                    </Badge>
+                  )}
+                </div>
+                {renderAgentList(localConfig.stageLevelAgents, "stage-level")}
+              </div>
+
+              <Separator />
+
+              {/* Candidate-Level Agents Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-green-600" />
+                  <div>
+                    <h3 className="text-base font-semibold">Candidate-Level Agents</h3>
+                    <p className="text-xs text-muted-foreground">
+                      Agents that run for each candidate (e.g., matching skills, checking salary range)
+                    </p>
+                  </div>
+                  {activeCandidateAgents > 0 && (
+                    <Badge variant="secondary" className="ml-auto">
+                      {activeCandidateAgents} active
+                    </Badge>
+                  )}
+                </div>
+                {renderAgentList(localConfig.candidateLevelAgents, "candidate-level")}
+              </div>
 
               {/* Summary */}
-              <div className="p-4 bg-muted rounded-lg">
-                <div className="flex items-start gap-2 mb-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
-                  <p className="text-sm font-medium">Active Criteria Summary</p>
-                </div>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {Object.entries(localConfig.criteria).map(([key, value]) => {
-                    if (value) {
-                      return (
-                        <Badge key={key} variant="secondary">
-                          {key.replace(/([A-Z])/g, " $1").trim()}
+              {totalActiveAgents > 0 && (
+                <div className="p-4 bg-muted rounded-lg">
+                  <div className="flex items-start gap-2 mb-2">
+                    <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
+                    <p className="text-sm font-medium">Active Agents Summary</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {localConfig.stageLevelAgents
+                      .filter(a => a.enabled)
+                      .map((agent) => (
+                        <Badge key={agent.id} variant="secondary" className="gap-1">
+                          <Layers className="h-3 w-3" />
+                          {agent.name}
                         </Badge>
-                      )
-                    }
-                    return null
-                  })}
+                      ))}
+                    {localConfig.candidateLevelAgents
+                      .filter(a => a.enabled)
+                      .map((agent) => (
+                        <Badge key={agent.id} variant="secondary" className="gap-1">
+                          <Users className="h-3 w-3" />
+                          {agent.name}
+                        </Badge>
+                      ))}
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {totalActiveAgents === 0 && (
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertDescription>
+                    No agents are currently active. Add and enable agents above to start automating this stage.
+                  </AlertDescription>
+                </Alert>
+              )}
             </>
           )}
         </div>

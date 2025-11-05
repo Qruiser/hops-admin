@@ -105,11 +105,27 @@ export function ScreeningStage() {
   const [agentConfig, setAgentConfig] = useState<AgentSettingsConfig>({
     stage: "Screening",
     enabled: true,
-    criteria: {
-      jobConsistency: true,
-      salaryMatch: true,
-      contractOpenness: true,
-    },
+    stageLevelAgents: [],
+    candidateLevelAgents: [
+      {
+        id: "job-consistency-1",
+        name: "Check Job Consistency",
+        enabled: true,
+        type: "candidate-level",
+      },
+      {
+        id: "salary-match-1",
+        name: "Check Salary Match",
+        enabled: true,
+        type: "candidate-level",
+      },
+      {
+        id: "contract-openness-1",
+        name: "Check Contract Openness",
+        enabled: true,
+        type: "candidate-level",
+      },
+    ],
   })
 
   const handleSelectCandidate = (candidate: any) => {

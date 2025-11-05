@@ -144,7 +144,8 @@ export function RecommendStage() {
   const [agentConfig, setAgentConfig] = useState<AgentSettingsConfig>({
     stage: "Recommend",
     enabled: false,
-    criteria: {},
+    stageLevelAgents: [],
+    candidateLevelAgents: [],
   })
 
   const handleSelectCandidate = (candidate: any) => {
