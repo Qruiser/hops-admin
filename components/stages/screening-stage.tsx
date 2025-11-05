@@ -112,12 +112,14 @@ export function ScreeningStage() {
         name: "Check Job Consistency",
         enabled: true,
         type: "candidate-level",
+        config: { threshold: 60 },
       },
       {
         id: "salary-match-1",
         name: "Check Salary Match",
         enabled: true,
         type: "candidate-level",
+        config: { threshold: 80 },
       },
       {
         id: "contract-openness-1",

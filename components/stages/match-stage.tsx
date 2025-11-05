@@ -414,24 +414,28 @@ export function MatchStage() {
         name: "Check Candidate Interest",
         enabled: true,
         type: "candidate-level",
+        config: { threshold: 70 },
       },
       {
         id: "preferences-match-1",
         name: "Check Preferences Match",
         enabled: true,
         type: "candidate-level",
+        config: { threshold: 75 },
       },
       {
         id: "within-budget-1",
         name: "Check Within Budget",
         enabled: true,
         type: "candidate-level",
+        config: { threshold: 80 },
       },
       {
         id: "skill-level-match-1",
         name: "Check Skill Level Match",
         enabled: true,
         type: "candidate-level",
+        config: { threshold: 75 },
       },
     ],
   })

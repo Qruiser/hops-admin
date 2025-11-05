@@ -131,12 +131,14 @@ export function SourceStage() {
         name: "Check Matching Skills",
         enabled: true,
         type: "candidate-level",
+        config: { threshold: 70 },
       },
       {
         id: "match-salary-range-1",
         name: "Match Salary Range",
         enabled: true,
         type: "candidate-level",
+        config: { threshold: 80 },
       },
     ],
   })
