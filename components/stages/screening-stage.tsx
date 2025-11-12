@@ -35,6 +35,8 @@ const candidates = [
     phone: "+1 (555) 123-4567",
     source: "linkedin",
     matchScore: 92,
+    deployabilityScore: 90,
+    confidence: 85,
     skills: ["React", "TypeScript", "Node.js"],
     experience: "5 years",
     location: "San Francisco, CA",
@@ -69,6 +71,8 @@ const candidates = [
     phone: "+1 (555) 987-6543",
     source: "internal",
     matchScore: 87,
+    deployabilityScore: 85,
+    confidence: 78,
     skills: ["React", "JavaScript", "CSS"],
     experience: "4 years",
     location: "New York, NY",
@@ -105,11 +109,29 @@ export function ScreeningStage() {
   const [agentConfig, setAgentConfig] = useState<AgentSettingsConfig>({
     stage: "Screening",
     enabled: true,
-    criteria: {
-      jobConsistency: true,
-      salaryMatch: true,
-      contractOpenness: true,
-    },
+    stageLevelAgents: [],
+    candidateLevelAgents: [
+      {
+        id: "job-consistency-1",
+        name: "Check Job Consistency",
+        enabled: true,
+        type: "candidate-level",
+        config: { threshold: 60 },
+      },
+      {
+        id: "salary-match-1",
+        name: "Check Salary Match",
+        enabled: true,
+        type: "candidate-level",
+        config: { threshold: 80 },
+      },
+      {
+        id: "contract-openness-1",
+        name: "Check Contract Openness",
+        enabled: true,
+        type: "candidate-level",
+      },
+    ],
   })
 
   const handleSelectCandidate = (candidate: any) => {

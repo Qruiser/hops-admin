@@ -1,22 +1,25 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import {
-  Linkedin,
-  Globe,
-  Database,
   RefreshCw,
   UserPlus,
   ArrowRight,
   Archive,
   MapPin,
   Briefcase,
+  Filter,
+  Linkedin,
+  Globe,
+  Database,
+  List,
 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CandidateCard } from "../candidate-card"
 import { CandidateScoringPanel } from "../candidate-scoring-panel"
 import { AgentSettings, AgentSettingsConfig } from "../agent-settings"
@@ -30,6 +33,8 @@ const candidates = [
     phone: "+1 (555) 123-4567",
     source: "linkedin",
     matchScore: 92,
+    deployabilityScore: 92,
+    confidence: 88,
     skills: ["React", "TypeScript", "Node.js", "GraphQL", "AWS"],
     matchedSkills: ["React", "TypeScript", "Node.js", "GraphQL", "AWS"],
     experience: "5 years",
@@ -50,6 +55,8 @@ const candidates = [
     phone: "+1 (555) 987-6543",
     source: "internal",
     matchScore: 87,
+    deployabilityScore: 87,
+    confidence: 82,
     skills: ["React", "JavaScript", "CSS", "HTML", "Redux"],
     matchedSkills: ["React", "JavaScript", "CSS"],
     experience: "4 years",
@@ -70,6 +77,8 @@ const candidates = [
     phone: "+1 (555) 456-7890",
     source: "website",
     matchScore: 78,
+    deployabilityScore: 78,
+    confidence: 72,
     skills: ["Angular", "TypeScript", "HTML", "CSS", "JavaScript"],
     matchedSkills: ["TypeScript", "HTML", "CSS"],
     experience: "3 years",
@@ -90,6 +99,8 @@ const candidates = [
     phone: "+1 (555) 789-0123",
     source: "linkedin",
     matchScore: 95,
+    deployabilityScore: 95,
+    confidence: 92,
     skills: ["React", "Redux", "GraphQL", "Node.js", "Express"],
     matchedSkills: ["React", "Redux", "GraphQL", "Node.js", "Express"],
     experience: "6 years",
@@ -108,21 +119,54 @@ const candidates = [
 export function SourceStage() {
   const [selectedCandidate, setSelectedCandidate] = useState<any>(null)
   const [isPanelOpen, setIsPanelOpen] = useState(false)
+  const [selectedSource, setSelectedSource] = useState<string>("all")
   
   // Agent settings configuration
   const [agentConfig, setAgentConfig] = useState<AgentSettingsConfig>({
     stage: "Sourcing",
     enabled: true,
-    criteria: {
-      gatherFromExistingDB: true,
-      checkMatchingSkills: true,
-      checkMatchingFrameworks: true,
-      checkJobConsistency: true,
-      matchSalaryRange: true,
-      checkContractOpenness: true,
-      locationBasedExperience: true,
-    },
+    stageLevelAgents: [
+      {
+        id: "fetch-internal-db-1",
+        name: "Fetch from Internal Database",
+        enabled: true,
+        type: "stage-level",
+      },
+    ],
+    candidateLevelAgents: [
+      {
+        id: "check-matching-skills-1",
+        name: "Check Matching Skills",
+        enabled: true,
+        type: "candidate-level",
+        config: { threshold: 70 },
+      },
+      {
+        id: "match-salary-range-1",
+        name: "Match Salary Range",
+        enabled: true,
+        type: "candidate-level",
+        config: { threshold: 80 },
+      },
+    ],
   })
+
+  // Filter candidates based on selected source
+  const filteredCandidates = useMemo(() => {
+    if (selectedSource === "all") {
+      return candidates
+    }
+    return candidates.filter((candidate) => {
+      const sourceMap: Record<string, string> = {
+        linkedin: "linkedin",
+        "internal-db": "internal",
+        website: "website",
+      }
+      return candidate.source === sourceMap[selectedSource]
+    })
+  }, [selectedSource])
+
+
 
   const handleSelectCandidate = (candidate: any) => {
     setSelectedCandidate(candidate)
@@ -137,64 +181,60 @@ export function SourceStage() {
     setAgentConfig(config)
   }
 
+  const totalCandidates = filteredCandidates.length
+
   return (
     <div className="space-y-6">
-      {/* Agent Settings */}
-      <div className="flex justify-end">
-        <AgentSettings config={agentConfig} onUpdate={handleAgentUpdate} />
+      {/* Filters, Agent Settings, Total Candidates, and Sync */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <Select value={selectedSource} onValueChange={setSelectedSource}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by source" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">
+                <div className="flex items-center gap-2">
+                  <List className="h-4 w-4 text-muted-foreground" />
+                  <span>All Sources</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="linkedin">
+                <div className="flex items-center gap-2">
+                  <Linkedin className="h-4 w-4 text-blue-600" />
+                  <span>LinkedIn</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="internal-db">
+                <div className="flex items-center gap-2">
+                  <Database className="h-4 w-4 text-green-600" />
+                  <span>Internal DB</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="website">
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-orange-600" />
+                  <span>Website</span>
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="text-sm text-muted-foreground">
+            <span className="font-medium">{totalCandidates}</span> total candidates
+          </div>
+          <Button variant="outline" size="sm" className="h-8 gap-1">
+            <RefreshCw className="h-3 w-3" />
+            Sync
+          </Button>
+          <AgentSettings config={agentConfig} onUpdate={handleAgentUpdate} />
+        </div>
       </div>
 
-      {/* Compact, full-width candidate aggregation snippet */}
-      <Card className="w-full">
-        <CardContent className="py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                  <Linkedin className="h-4 w-4 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">LinkedIn</p>
-                  <p className="text-xs text-muted-foreground">12 candidates</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
-                  <Globe className="h-4 w-4 text-orange-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Website</p>
-                  <p className="text-xs text-muted-foreground">5 candidates</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                  <Database className="h-4 w-4 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Internal DB</p>
-                  <p className="text-xs text-muted-foreground">7 candidates</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-muted-foreground">
-                <span className="font-medium">24</span> total candidates
-              </div>
-              <Button variant="outline" size="sm" className="h-8 gap-1">
-                <RefreshCw className="h-3 w-3" />
-                Sync
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {candidates.map((candidate) => (
+        {filteredCandidates.map((candidate) => (
           <div key={candidate.id} onClick={() => handleSelectCandidate(candidate)} className="cursor-pointer">
             <CandidateCard candidate={candidate} />
           </div>
@@ -211,9 +251,15 @@ export function SourceStage() {
         {/* Stage-specific content */}
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-green-100">
-            <span className="text-3xl font-bold text-green-600">{selectedCandidate?.matchScore}%</span>
+            <span className="text-3xl font-bold text-green-600">
+              {selectedCandidate?.deployabilityScore ?? selectedCandidate?.matchScore}
+              <span className="text-xl font-normal text-muted-foreground">/100</span>
+            </span>
           </div>
-          <p className="mt-2 font-medium">AI Match Score</p>
+          <p className="mt-2 font-medium">Deployability Score</p>
+          {selectedCandidate?.confidence && (
+            <p className="mt-1 text-sm text-muted-foreground">{selectedCandidate.confidence}% confidence</p>
+          )}
         </div>
 
         {/* Matched Skills Section */}

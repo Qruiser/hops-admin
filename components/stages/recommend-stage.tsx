@@ -19,6 +19,8 @@ const candidates = [
     phone: "+1 (555) 123-4567",
     source: "linkedin",
     matchScore: 92,
+    deployabilityScore: 93,
+    confidence: 90,
     skills: ["React", "TypeScript", "Node.js"],
     experience: "5 years",
     location: "San Francisco, CA",
@@ -63,6 +65,8 @@ const candidates = [
     phone: "+1 (555) 987-6543",
     source: "internal",
     matchScore: 87,
+    deployabilityScore: 88,
+    confidence: 83,
     skills: ["React", "JavaScript", "CSS"],
     experience: "4 years",
     location: "New York, NY",
@@ -106,6 +110,8 @@ const candidates = [
     phone: "+1 (555) 456-7890",
     source: "website",
     matchScore: 78,
+    deployabilityScore: 79,
+    confidence: 75,
     skills: ["Angular", "TypeScript", "HTML"],
     experience: "3 years",
     location: "Chicago, IL",
@@ -144,7 +150,8 @@ export function RecommendStage() {
   const [agentConfig, setAgentConfig] = useState<AgentSettingsConfig>({
     stage: "Recommend",
     enabled: false,
-    criteria: {},
+    stageLevelAgents: [],
+    candidateLevelAgents: [],
   })
 
   const handleSelectCandidate = (candidate: any) => {
@@ -282,11 +289,12 @@ export function RecommendStage() {
                           <span>{selectedCandidate.timeline.interviewSetup.location}</span>
                         </div>
 
-                        {selectedCandidate.timeline.interviewSetup.rescheduled && (
-                          <div className="mt-1 text-amber-600 italic">
-                            Rescheduled from {formatDate(selectedCandidate.timeline.interviewSetup.originalDate)}
-                          </div>
-                        )}
+                        {selectedCandidate.timeline.interviewSetup.rescheduled &&
+                          selectedCandidate.timeline.interviewSetup.originalDate && (
+                            <div className="mt-1 text-amber-600 italic">
+                              Rescheduled from {formatDate(selectedCandidate.timeline.interviewSetup.originalDate)}
+                            </div>
+                          )}
                       </div>
                     )}
                   </div>
@@ -305,11 +313,12 @@ export function RecommendStage() {
                   </div>
                   <div className="flex justify-between items-center">
                     <h4 className="text-sm font-medium">Interview Completed</h4>
-                    {selectedCandidate.timeline.interviewCompleted.completed && (
-                      <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200 text-xs">
-                        {formatDate(selectedCandidate.timeline.interviewCompleted.date)}
-                      </Badge>
-                    )}
+                    {selectedCandidate.timeline.interviewCompleted.completed &&
+                      selectedCandidate.timeline.interviewCompleted.date && (
+                        <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200 text-xs">
+                          {formatDate(selectedCandidate.timeline.interviewCompleted.date)}
+                        </Badge>
+                      )}
                   </div>
 
                   {selectedCandidate.timeline.interviewCompleted.completed &&
@@ -347,18 +356,19 @@ export function RecommendStage() {
                             : "Rejected"
                           : "Awaiting Decision"}
                       </h4>
-                      {selectedCandidate.timeline.finalDecision.completed && (
-                        <Badge
-                          variant="outline"
-                          className={`${
-                            selectedCandidate.timeline.finalDecision.status === "shortlisted"
-                              ? "bg-green-100 text-green-800 border-green-200"
-                              : "bg-red-100 text-red-800 border-red-200"
-                          } text-xs`}
-                        >
-                          {formatDate(selectedCandidate.timeline.finalDecision.date)}
-                        </Badge>
-                      )}
+                      {selectedCandidate.timeline.finalDecision.completed &&
+                        selectedCandidate.timeline.finalDecision.date && (
+                          <Badge
+                            variant="outline"
+                            className={`${
+                              selectedCandidate.timeline.finalDecision.status === "shortlisted"
+                                ? "bg-green-100 text-green-800 border-green-200"
+                                : "bg-red-100 text-red-800 border-red-200"
+                            } text-xs`}
+                          >
+                            {formatDate(selectedCandidate.timeline.finalDecision.date)}
+                          </Badge>
+                        )}
                     </div>
 
                     {selectedCandidate.timeline.finalDecision.completed &&

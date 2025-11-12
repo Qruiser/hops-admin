@@ -15,6 +15,9 @@ import {
   XCircle,
   FileCheck,
   AlertCircle,
+  TrendingUp,
+  CheckCircle,
+  Circle,
 } from "lucide-react"
 
 interface CandidateCardProps {
@@ -194,6 +197,82 @@ export function CandidateCard({ candidate, isSelected }: CandidateCardProps) {
     }
   }
 
+  // Get deployability score and confidence, fallback to matchScore if not available
+  const deployabilityScore = candidate.deployabilityScore ?? candidate.matchScore
+  const confidence = candidate.confidence ?? 85 // Default confidence if not provided
+
+  // Determine confidence color based on level
+  const getConfidenceColor = (conf: number) => {
+    if (conf >= 80) return "text-green-600"
+    if (conf >= 60) return "text-amber-600"
+    return "text-red-600"
+  }
+
+  // Function to get agent job status based on candidate stage
+  const getAgentJobStatus = () => {
+    // Map candidate status to stage name
+    const stageMap: Record<string, string> = {
+      new: "Sourcing",
+      contacted: "Sourcing",
+      verified: "Screening",
+      in_progress: "Screening",
+      matched: "Match",
+      recommended: "Recommend",
+      deploy: "Deploy",
+    }
+
+    const stage = stageMap[candidate.status] || "Sourcing"
+
+    // Define agents for each stage (candidate-level agents only)
+    const stageAgents: Record<string, string[]> = {
+      Sourcing: [
+        "Check Matching Skills",
+        "Check Matching Frameworks",
+        "Check Job Consistency",
+        "Match Salary Range",
+        "Check Contract Openness",
+      ],
+      Screening: [
+        "Check Job Consistency",
+        "Check Salary Match",
+        "Check Contract Openness",
+      ],
+      Match: [
+        "Check Candidate Interest",
+        "Check Preferences Match",
+        "Check Within Budget",
+        "Check Skill Level Match",
+      ],
+      Recommend: [],
+      Deploy: [],
+    }
+
+    const agents = stageAgents[stage] || []
+
+    if (agents.length === 0) {
+      return {
+        completed: 0,
+        pending: 0,
+        total: 0,
+      }
+    }
+
+    // For demo purposes, simulate completion status
+    // In a real app, this would come from the candidate's agent job status data
+    const completedJobs = candidate.agentJobsCompleted !== undefined 
+      ? candidate.agentJobsCompleted 
+      : Math.max(0, Math.floor(agents.length * 0.6)) // Default to 60% completed
+    const pendingJobs = Math.max(0, agents.length - completedJobs)
+
+    return {
+      completed: Math.min(completedJobs, agents.length),
+      pending: pendingJobs,
+      total: agents.length,
+    }
+  }
+
+  const agentStatus = getAgentJobStatus()
+
   return (
     <Card className={`hover:shadow-md transition-shadow cursor-pointer ${isSelected ? "ring-2 ring-primary" : ""}`}>
       <CardContent className="p-4">
@@ -202,7 +281,13 @@ export function CandidateCard({ candidate, isSelected }: CandidateCardProps) {
             <h3 className="font-semibold">{candidate.name}</h3>
             <p className="text-xs text-muted-foreground">{candidate.email}</p>
           </div>
-          <div className="text-xl font-bold text-green-600">{candidate.matchScore}%</div>
+          <div className="text-right">
+            <div className="text-xl font-bold text-green-600">{deployabilityScore}<span className="text-sm font-normal text-muted-foreground">/100</span></div>
+            <div className="text-xs text-muted-foreground flex items-center gap-1">
+              <TrendingUp className={`h-3 w-3 ${getConfidenceColor(confidence)}`} />
+              <span className={getConfidenceColor(confidence)}>{confidence}% confidence</span>
+            </div>
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-1 mb-3">
@@ -254,6 +339,32 @@ export function CandidateCard({ candidate, isSelected }: CandidateCardProps) {
             {getStatusBadge()}
           </div>
         </div>
+
+        {/* Agent Job Status Row */}
+        {agentStatus.total > 0 && (
+          <div className="flex items-center justify-between pt-2 mt-2 border-t text-xs">
+            <div className="flex items-center gap-3">
+              <span className="text-muted-foreground font-medium">Agent Jobs:</span>
+              {agentStatus.completed > 0 && (
+                <div className="flex items-center gap-1 text-green-600">
+                  <CheckCircle className="h-3 w-3" />
+                  <span className="font-medium">{agentStatus.completed} completed</span>
+                </div>
+              )}
+              {agentStatus.pending > 0 && (
+                <div className="flex items-center gap-1 text-amber-600">
+                  <Circle className="h-3 w-3" />
+                  <span className="font-medium">{agentStatus.pending} pending</span>
+                </div>
+              )}
+            </div>
+            {agentStatus.total > 0 && (
+              <div className="text-muted-foreground">
+                {agentStatus.completed}/{agentStatus.total}
+              </div>
+            )}
+          </div>
+        )}
       </CardContent>
     </Card>
   )

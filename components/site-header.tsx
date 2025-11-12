@@ -9,21 +9,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Bell, LogOut, Settings, User } from "lucide-react"
+import { Bell, LogOut, Settings, User, ArrowLeft } from "lucide-react"
 
 interface SiteHeaderProps {
   title?: string
   subtitle?: string
+  backUrl?: string
 }
 
-export function SiteHeader({ title = "Recruitment Dashboard", subtitle = "Manage your recruitment opportunities and candidates" }: SiteHeaderProps) {
+export function SiteHeader({ title = "Recruitment Dashboard", subtitle = "Manage your recruitment opportunities and candidates", backUrl }: SiteHeaderProps) {
+  const href = backUrl || "/"
+  
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container max-w-[1600px] flex h-20 items-center justify-between px-6">
         <div className="flex items-center">
-          <Link href="/" className="flex flex-col items-start space-y-1">
-            <h1 className="text-xl font-bold tracking-tight text-foreground">{title}</h1>
-            <p className="text-sm text-muted-foreground">{subtitle}</p>
+          <Link href={href} className="flex items-center gap-2 group">
+            {backUrl && (
+              <ArrowLeft className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+            )}
+            <div className="flex flex-col items-start space-y-1">
+              <h1 className="text-xl font-bold tracking-tight text-foreground">{title}</h1>
+              <p className="text-sm text-muted-foreground">{subtitle}</p>
+            </div>
           </Link>
         </div>
         <div className="flex items-center gap-6">

@@ -37,6 +37,8 @@ const candidates = [
     phone: "+1 (555) 123-4567",
     source: "linkedin",
     matchScore: 92,
+    deployabilityScore: 95,
+    confidence: 95,
     skills: ["React", "TypeScript", "Node.js"],
     experience: "5 years",
     location: "San Francisco, CA",
@@ -74,6 +76,8 @@ const candidates = [
     phone: "+1 (555) 987-6543",
     source: "internal",
     matchScore: 87,
+    deployabilityScore: 88,
+    confidence: 85,
     skills: ["React", "JavaScript", "CSS"],
     experience: "4 years",
     location: "New York, NY",
@@ -111,6 +115,8 @@ const candidates = [
     phone: "+1 (555) 456-7890",
     source: "referral",
     matchScore: 79,
+    deployabilityScore: 80,
+    confidence: 78,
     skills: ["JavaScript", "React", "HTML", "CSS"],
     experience: "3 years",
     location: "Chicago, IL",
@@ -267,7 +273,8 @@ export function DeployStage() {
   const [agentConfig, setAgentConfig] = useState<AgentSettingsConfig>({
     stage: "Deploy",
     enabled: false,
-    criteria: {},
+    stageLevelAgents: [],
+    candidateLevelAgents: [],
   })
 
   const handleSelectCandidate = (candidate: any) => {
