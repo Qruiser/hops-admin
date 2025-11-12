@@ -33,6 +33,8 @@ const candidates = [
     phone: "+1 (555) 123-4567",
     source: "linkedin",
     matchScore: 92,
+    deployabilityScore: 92,
+    confidence: 88,
     skills: ["React", "TypeScript", "Node.js", "GraphQL", "AWS"],
     matchedSkills: ["React", "TypeScript", "Node.js", "GraphQL", "AWS"],
     experience: "5 years",
@@ -53,6 +55,8 @@ const candidates = [
     phone: "+1 (555) 987-6543",
     source: "internal",
     matchScore: 87,
+    deployabilityScore: 87,
+    confidence: 82,
     skills: ["React", "JavaScript", "CSS", "HTML", "Redux"],
     matchedSkills: ["React", "JavaScript", "CSS"],
     experience: "4 years",
@@ -73,6 +77,8 @@ const candidates = [
     phone: "+1 (555) 456-7890",
     source: "website",
     matchScore: 78,
+    deployabilityScore: 78,
+    confidence: 72,
     skills: ["Angular", "TypeScript", "HTML", "CSS", "JavaScript"],
     matchedSkills: ["TypeScript", "HTML", "CSS"],
     experience: "3 years",
@@ -93,6 +99,8 @@ const candidates = [
     phone: "+1 (555) 789-0123",
     source: "linkedin",
     matchScore: 95,
+    deployabilityScore: 95,
+    confidence: 92,
     skills: ["React", "Redux", "GraphQL", "Node.js", "Express"],
     matchedSkills: ["React", "Redux", "GraphQL", "Node.js", "Express"],
     experience: "6 years",
@@ -243,9 +251,15 @@ export function SourceStage() {
         {/* Stage-specific content */}
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-green-100">
-            <span className="text-3xl font-bold text-green-600">{selectedCandidate?.matchScore}%</span>
+            <span className="text-3xl font-bold text-green-600">
+              {selectedCandidate?.deployabilityScore ?? selectedCandidate?.matchScore}
+              <span className="text-xl font-normal text-muted-foreground">/100</span>
+            </span>
           </div>
-          <p className="mt-2 font-medium">AI Match Score</p>
+          <p className="mt-2 font-medium">Deployability Score</p>
+          {selectedCandidate?.confidence && (
+            <p className="mt-1 text-sm text-muted-foreground">{selectedCandidate.confidence}% confidence</p>
+          )}
         </div>
 
         {/* Matched Skills Section */}

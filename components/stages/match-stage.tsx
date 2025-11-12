@@ -30,6 +30,8 @@ const candidates = [
     phone: "+1 (555) 123-4567",
     source: "linkedin",
     matchScore: 92,
+    deployabilityScore: 91,
+    confidence: 87,
     skills: ["React", "TypeScript", "Node.js"],
     experience: "5 years",
     location: "San Francisco, CA",
@@ -152,6 +154,8 @@ const candidates = [
     phone: "+1 (555) 987-6543",
     source: "internal",
     matchScore: 87,
+    deployabilityScore: 86,
+    confidence: 80,
     skills: ["React", "JavaScript", "CSS"],
     experience: "4 years",
     location: "New York, NY",
@@ -480,9 +484,15 @@ export function MatchStage() {
             <div className="space-y-4">
               <div className="text-center">
                 <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100">
-                  <span className="text-2xl font-bold text-green-600">{selectedCandidate.matchScore}%</span>
+                  <span className="text-2xl font-bold text-green-600">
+                    {selectedCandidate.deployabilityScore ?? selectedCandidate.matchScore}
+                    <span className="text-lg font-normal text-muted-foreground">/100</span>
+                  </span>
                 </div>
-                <p className="mt-2 text-sm font-medium">Overall Match</p>
+                <p className="mt-2 text-sm font-medium">Deployability Score</p>
+                {selectedCandidate.confidence && (
+                  <p className="mt-1 text-xs text-muted-foreground">{selectedCandidate.confidence}% confidence</p>
+                )}
               </div>
 
               <div className="border-t pt-4">
