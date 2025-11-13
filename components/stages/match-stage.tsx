@@ -146,6 +146,73 @@ const candidates = [
       offerSalary: "$115,000",
       customQuestionAnswer: true,
     },
+    // Agent job results
+    agentJobResults: [
+      {
+        id: "job-match-1",
+        name: "Check Candidate Interest",
+        score: 85,
+        threshold: 70,
+        completed: true,
+        passed: true,
+        evidence: {
+          type: "text",
+          source: "Initial Screening Call Transcript",
+          matching: [{ label: "Interest Level", value: "Strong - Expressed alignment with company values" }],
+          nonMatching: [{ label: "Concern", value: "Asked about work-life balance policies" }],
+        },
+      },
+      {
+        id: "job-match-2",
+        name: "Check Preferences Match",
+        score: 78,
+        threshold: 75,
+        completed: true,
+        passed: true,
+        evidence: {
+          type: "preferences",
+          source: "Candidate Preferences Form",
+          matching: [
+            { label: "Remote Work", value: "Yes (preferred)" },
+            { label: "Work Type", value: "Full-time" },
+          ],
+          nonMatching: [
+            { label: "Location", value: "Prefers remote (job requires San Francisco office)" },
+          ],
+        },
+      },
+      {
+        id: "job-match-3",
+        name: "Check Within Budget",
+        score: 82,
+        threshold: 80,
+        completed: true,
+        passed: true,
+        evidence: {
+          type: "salary",
+          source: "Salary Negotiation Records",
+          matching: [
+            { label: "Expected", value: "$120,000" },
+            { label: "Budget", value: "$115,000 - $125,000" },
+            { label: "Status", value: "Within range" },
+          ],
+        },
+      },
+      {
+        id: "job-match-4",
+        name: "Check Skill Level Match",
+        score: 88,
+        threshold: 75,
+        completed: true,
+        passed: true,
+        evidence: {
+          type: "skills",
+          source: "Resume & Technical Assessment",
+          matching: ["React (5+ years)", "TypeScript (3+ years)", "Node.js (4+ years)", "GraphQL (2+ years)"],
+          nonMatching: ["Python (required but not listed)", "Docker (required but limited experience)"],
+        },
+      },
+    ],
   },
   {
     id: "2",
@@ -277,6 +344,67 @@ const candidates = [
       offerSalary: "$105,000",
       customQuestionAnswer: false,
     },
+    // Agent job results
+    agentJobResults: [
+      {
+        id: "job-match-5",
+        name: "Check Candidate Interest",
+        score: 72,
+        threshold: 70,
+        completed: true,
+        passed: true,
+        evidence: {
+          type: "text",
+          source: "Initial Screening Call Transcript",
+          matching: [{ label: "Engagement", value: "Asked relevant questions about team structure" }],
+          nonMatching: [{ label: "Interest Level", value: "Moderate - Expressed some concerns about role scope" }],
+        },
+      },
+      {
+        id: "job-match-6",
+        name: "Check Preferences Match",
+        score: 68,
+        threshold: 75,
+        completed: true,
+        passed: false,
+        evidence: {
+          type: "preferences",
+          source: "Candidate Preferences Form",
+          matching: [
+            { label: "Work Type", value: "Full-time" },
+            { label: "Location", value: "New York, NY" },
+          ],
+          nonMatching: [
+            { label: "Remote Work", value: "No (prefers office) - Job requires remote work" },
+          ],
+        },
+      },
+      {
+        id: "job-match-7",
+        name: "Check Within Budget",
+        score: 85,
+        threshold: 80,
+        completed: true,
+        passed: true,
+        evidence: {
+          type: "salary",
+          source: "Salary Negotiation Records",
+          matching: [
+            { label: "Expected", value: "$110,000" },
+            { label: "Budget", value: "$105,000 - $115,000" },
+            { label: "Status", value: "Within range" },
+          ],
+        },
+      },
+      {
+        id: "job-match-8",
+        name: "Check Skill Level Match",
+        score: 0,
+        threshold: 75,
+        completed: false,
+        passed: false,
+      },
+    ],
   },
 ]
 
@@ -482,19 +610,6 @@ export function MatchStage() {
 
             {/* Stage-specific content - now more prominent */}
             <div className="space-y-4">
-              <div className="text-center">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100">
-                  <span className="text-2xl font-bold text-green-600">
-                    {selectedCandidate.deployabilityScore ?? selectedCandidate.matchScore}
-                    <span className="text-lg font-normal text-muted-foreground">/100</span>
-                  </span>
-                </div>
-                <p className="mt-2 text-sm font-medium">Deployability Score</p>
-                {selectedCandidate.confidence && (
-                  <p className="mt-1 text-xs text-muted-foreground">{selectedCandidate.confidence}% confidence</p>
-                )}
-              </div>
-
               <div className="border-t pt-4">
                 <h5 className="text-xs font-medium text-muted-foreground mb-2">Requirements Match</h5>
                 <div className="space-y-3">

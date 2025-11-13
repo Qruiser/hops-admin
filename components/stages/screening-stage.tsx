@@ -63,6 +63,61 @@ const candidates = [
       meetingLink: "https://meet.qrusible.com/abc123",
       inviteCode: "QRU-123-456",
     },
+    // Agent job results
+    agentJobResults: [
+      {
+        id: "job-screening-1",
+        name: "Check Job Consistency",
+        score: 75,
+        threshold: 60,
+        completed: true,
+        passed: true,
+        evidence: {
+          type: "consistency",
+          source: "Employment History Verification",
+          matching: [
+            { label: "Current Role", value: "5 years at TechCorp as Senior Developer" },
+            { label: "Pattern", value: "Stable long-term employment" },
+          ],
+          nonMatching: [
+            { label: "Previous Role", value: "Only 8 months at previous company" },
+          ],
+        },
+      },
+      {
+        id: "job-screening-2",
+        name: "Check Salary Match",
+        score: 88,
+        threshold: 80,
+        completed: true,
+        passed: true,
+        evidence: {
+          type: "salary",
+          source: "Salary Discussion & Pay Stubs",
+          matching: [
+            { label: "Expected", value: "$120,000" },
+            { label: "Offered", value: "$115,000" },
+            { label: "Current", value: "$110,000" },
+          ],
+        },
+      },
+      {
+        id: "job-screening-3",
+        name: "Check Contract Openness",
+        score: 85,
+        threshold: 0,
+        completed: true,
+        passed: true,
+        evidence: {
+          type: "preferences",
+          source: "Screening Questionnaire",
+          matching: [
+            { label: "Open to Contract", value: "Yes" },
+            { label: "Contract Duration", value: "6-12 months preferred" },
+          ],
+        },
+      },
+    ],
   },
   {
     id: "2",
@@ -99,6 +154,33 @@ const candidates = [
       meetingLink: null,
       inviteCode: null,
     },
+    // Agent job results
+    agentJobResults: [
+      {
+        id: "job-screening-4",
+        name: "Check Job Consistency",
+        score: 55,
+        threshold: 60,
+        completed: true,
+        passed: false,
+      },
+      {
+        id: "job-screening-5",
+        name: "Check Salary Match",
+        score: 0,
+        threshold: 80,
+        completed: false,
+        passed: false,
+      },
+      {
+        id: "job-screening-6",
+        name: "Check Contract Openness",
+        score: 0,
+        threshold: 0,
+        completed: false,
+        passed: false,
+      },
+    ],
   },
 ]
 
