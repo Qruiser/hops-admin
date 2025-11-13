@@ -47,6 +47,87 @@ const candidates = [
     potential: "high",
     currentPosition: "Senior Developer",
     currentCompany: "TechCorp",
+    // Agent job results
+    agentJobResults: [
+      {
+        id: "job-source-1",
+        name: "Check Matching Skills",
+        score: 92,
+        threshold: 70,
+        completed: true,
+        passed: true,
+        evidence: {
+          type: "skills",
+          source: "Resume & LinkedIn Profile",
+          matching: ["React", "TypeScript", "Node.js", "GraphQL", "AWS"],
+          nonMatching: ["Vue.js", "Angular"],
+        },
+      },
+      {
+        id: "job-source-2",
+        name: "Check Matching Frameworks",
+        score: 88,
+        threshold: 70,
+        completed: true,
+        passed: true,
+        evidence: {
+          type: "frameworks",
+          source: "Resume & Portfolio Projects",
+          matching: ["React", "Next.js", "Express", "Apollo GraphQL"],
+          nonMatching: ["Vue.js", "Nuxt.js"],
+        },
+      },
+      {
+        id: "job-source-3",
+        name: "Check Job Consistency",
+        score: 75,
+        threshold: 60,
+        completed: true,
+        passed: true,
+        evidence: {
+          type: "consistency",
+          source: "Employment History Analysis",
+          matching: [{ label: "Employment Pattern", value: "Stable - 5+ years with 2 companies" }],
+          nonMatching: [{ label: "Gap Concern", value: "3-month gap in 2020" }],
+        },
+      },
+      {
+        id: "job-source-4",
+        name: "Match Salary Range",
+        score: 85,
+        threshold: 80,
+        completed: true,
+        passed: true,
+        evidence: {
+          type: "salary",
+          source: "Candidate Preferences & Job Spec",
+          matching: [
+            { label: "Expected", value: "$120,000" },
+            { label: "Offered", value: "$115,000" },
+            { label: "Range", value: "$110,000 - $130,000" },
+          ],
+        },
+      },
+      {
+        id: "job-source-5",
+        name: "Check Contract Openness",
+        score: 90,
+        threshold: 0,
+        completed: true,
+        passed: true,
+        evidence: {
+          type: "preferences",
+          source: "Screening Questionnaire",
+          matching: [
+            { label: "Open to Contract", value: "Yes" },
+            { label: "Preferred Duration", value: "6-12 months" },
+          ],
+          nonMatching: [
+            { label: "Work Location", value: "Prefers remote (job requires hybrid)" },
+          ],
+        },
+      },
+    ],
   },
   {
     id: "2",
@@ -69,6 +150,70 @@ const candidates = [
     potential: "medium",
     currentPosition: "Frontend Developer",
     currentCompany: "WebSolutions Inc.",
+    // Agent job results
+    agentJobResults: [
+      {
+        id: "job-source-6",
+        name: "Check Matching Skills",
+        score: 85,
+        threshold: 70,
+        completed: true,
+        passed: true,
+        evidence: {
+          type: "skills",
+          source: "Resume & LinkedIn Profile",
+          matching: ["React", "JavaScript", "CSS"],
+          nonMatching: ["TypeScript", "GraphQL", "Node.js"],
+        },
+      },
+      {
+        id: "job-source-7",
+        name: "Check Matching Frameworks",
+        score: 65,
+        threshold: 70,
+        completed: true,
+        passed: false,
+        evidence: {
+          type: "frameworks",
+          source: "Resume & Portfolio Projects",
+          matching: ["React", "Redux"],
+          nonMatching: ["Next.js", "GraphQL", "Express"],
+        },
+      },
+      {
+        id: "job-source-8",
+        name: "Check Job Consistency",
+        score: 0,
+        threshold: 60,
+        completed: false,
+        passed: false,
+      },
+      {
+        id: "job-source-9",
+        name: "Match Salary Range",
+        score: 82,
+        threshold: 80,
+        completed: true,
+        passed: true,
+        evidence: {
+          type: "salary",
+          source: "Candidate Preferences & Job Spec",
+          matching: [
+            { label: "Expected", value: "$110,000" },
+            { label: "Offered", value: "$105,000" },
+            { label: "Range", value: "$100,000 - $120,000" },
+          ],
+        },
+      },
+      {
+        id: "job-source-10",
+        name: "Check Contract Openness",
+        score: 0,
+        threshold: 0,
+        completed: false,
+        passed: false,
+      },
+    ],
   },
   {
     id: "3",
@@ -249,112 +394,6 @@ export function SourceStage() {
         onClose={closePanel}
       >
         {/* Stage-specific content */}
-        <div className="text-center">
-          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-green-100">
-            <span className="text-3xl font-bold text-green-600">
-              {selectedCandidate?.deployabilityScore ?? selectedCandidate?.matchScore}
-              <span className="text-xl font-normal text-muted-foreground">/100</span>
-            </span>
-          </div>
-          <p className="mt-2 font-medium">Deployability Score</p>
-          {selectedCandidate?.confidence && (
-            <p className="mt-1 text-sm text-muted-foreground">{selectedCandidate.confidence}% confidence</p>
-          )}
-        </div>
-
-        {/* Matched Skills Section */}
-        {selectedCandidate?.matchedSkills && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium">Matched Skills</h4>
-            <div className="flex flex-wrap gap-2">
-              {selectedCandidate.matchedSkills.slice(0, 5).map((skill: string) => (
-                <Badge key={skill} variant="secondary" className="bg-green-50 text-green-700 border-green-200">
-                  {skill}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Match breakdown */}
-        {selectedCandidate?.skillsMatch !== undefined && (
-          <div className="space-y-3">
-            {selectedCandidate.skillsMatch && (
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm">Skills Match</span>
-                  <span className="text-sm font-medium">{selectedCandidate.skillsMatch}%</span>
-                </div>
-                <Progress value={selectedCandidate.skillsMatch} className="h-2" />
-              </div>
-            )}
-
-            {selectedCandidate.experienceMatch && (
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-1">
-                    <Briefcase className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-sm">Experience Match</span>
-                  </div>
-                  <span className="text-sm font-medium">{selectedCandidate.experienceMatch}%</span>
-                </div>
-                <Progress value={selectedCandidate.experienceMatch} className="h-2" />
-                {selectedCandidate.currentPosition && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {selectedCandidate.experience} as {selectedCandidate.currentPosition} at{" "}
-                    {selectedCandidate.currentCompany}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {selectedCandidate.locationMatch && (
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-sm">Location Match</span>
-                  </div>
-                  <span className="text-sm font-medium">{selectedCandidate.locationMatch}%</span>
-                </div>
-                <Progress value={selectedCandidate.locationMatch} className="h-2" />
-                <p className="text-xs text-muted-foreground mt-1">{selectedCandidate.location}</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Actions */}
-        <div className="flex flex-col gap-2 pt-2">
-          <Button className="w-full gap-2">
-            <UserPlus className="h-4 w-4" />
-            Review Profile
-          </Button>
-
-          <div className="flex gap-2">
-            <Button className="flex-1 gap-2">
-              <ArrowRight className="h-4 w-4" />
-              Move to Screening
-            </Button>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2">
-                  <Archive className="h-4 w-4" />
-                  Archive
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem>Salary not match</DropdownMenuItem>
-                <DropdownMenuItem>Doesn't want contract</DropdownMenuItem>
-                <DropdownMenuItem>Skills not matched</DropdownMenuItem>
-                <DropdownMenuItem>No contact information</DropdownMenuItem>
-                <DropdownMenuItem>Doesn't want to complete profile</DropdownMenuItem>
-                <DropdownMenuItem>Traits not matched</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
       </CandidateScoringPanel>
     </div>
   )
