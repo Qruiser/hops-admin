@@ -20,7 +20,7 @@ export function CandidateScoringPanel({ candidate, title = "Candidate Scoring", 
     <>
       {/* Sliding Panel */}
       <div
-        className={`fixed right-0 top-0 h-full w-full md:w-[480px] bg-background border-l shadow-xl transition-transform duration-300 ease-in-out z-[9999] ${
+        className={`fixed right-0 top-0 h-full w-full md:w-auto md:min-w-[480px] md:max-w-[calc(100vw-2rem)] bg-background border-l shadow-xl transition-all duration-300 ease-in-out z-[9999] ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -34,7 +34,7 @@ export function CandidateScoringPanel({ candidate, title = "Candidate Scoring", 
           </div>
 
           {/* Content - Scrollable */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4">
             {/* Compact Candidate Info Panel */}
             <CandidateInfoPanel candidate={candidate} />
 
