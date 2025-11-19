@@ -5,12 +5,18 @@ import { Mail, Phone, Building, Briefcase, TrendingUp, ChevronDown, ChevronUp, C
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { AgentJobResults } from "./agent-job-results"
+import { InlineEvidenceViewer } from "./inline-evidence-viewer"
 
 interface CandidateInfoPanelProps {
   candidate: any
 }
 
 export function CandidateInfoPanel({ candidate }: CandidateInfoPanelProps) {
+  const [openEvidenceViewer, setOpenEvidenceViewer] = useState<{
+    evidence: any
+    type: 'suitability' | 'readiness' | 'agent-job'
+  } | null>(null)
+
   // Get deployability breakdown data
   const deployabilityScore = candidate.deployabilityScore ?? candidate.matchScore ?? 0
   const suitabilityScore = candidate.suitabilityScore ?? Math.round(deployabilityScore * 0.97) // Default calculation
@@ -43,100 +49,160 @@ export function CandidateInfoPanel({ candidate }: CandidateInfoPanelProps) {
   }
 
   return (
-    <div className="border rounded-md mb-4">
-      {/* Deployability Score - At the top */}
-      <div className="p-4 border-b bg-muted/20">
-        <div className="border rounded-md p-3 bg-background">
-          <div className="text-center mb-4">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100">
-              <span className="text-xl font-bold text-green-600">
-                {deployabilityScore}
-                <span className="text-base font-normal text-muted-foreground">/100</span>
-              </span>
+    <div className={`border-2 border-slate-200 rounded-xl mb-4 bg-white flex transition-all duration-300 shadow-lg ${openEvidenceViewer ? 'flex-row' : 'flex-col'}`}>
+      <div className={`flex flex-col flex-1 ${openEvidenceViewer ? 'flex-shrink-0 min-w-[400px]' : ''}`}>
+        {/* Candidate Profile Section - Top Position (Blue = Trust, Professional) */}
+        <div className="p-6 border-b-2 border-slate-200 bg-gradient-to-br from-blue-50/60 via-white to-indigo-50/40">
+          {/* Header with Avatar and Name - Figure/Ground Principle */}
+          <div className="flex items-center gap-4 mb-6 pb-5 border-b-2 border-slate-200">
+            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg ring-4 ring-blue-100/50">
+              <span className="text-2xl font-black text-white">{candidate.name.charAt(0)}</span>
             </div>
-            <p className="mt-2 text-sm font-medium">Deployability Score</p>
-            {candidate.confidence && (
-              <div className="flex items-center justify-center gap-1 mt-1">
-                <TrendingUp className={`h-3 w-3 ${
-                  candidate.confidence >= 80 ? "text-green-600" :
-                  candidate.confidence >= 60 ? "text-amber-600" : "text-red-600"
-                }`} />
-                <span className={`text-xs ${
-                  candidate.confidence >= 80 ? "text-green-600" :
-                  candidate.confidence >= 60 ? "text-amber-600" : "text-red-600"
-                }`}>
-                  {candidate.confidence}% confidence
-                </span>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-xl font-black text-slate-900 mb-1">{candidate.name}</h3>
+              <p className="text-sm font-semibold text-slate-600">{candidate.currentPosition || candidate.experience}</p>
+            </div>
+          </div>
+          
+          {/* Information Cards Grid - Common Region & Similarity Principles */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Email Card */}
+            <div className="group bg-white border-2 border-blue-200 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer">
+              <div className="flex items-start gap-3">
+                <div className="p-2.5 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg shadow-sm group-hover:scale-110 transition-transform">
+                  <Mail className="h-5 w-5 text-blue-700 flex-shrink-0" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Email</div>
+                  <div className="text-sm font-semibold text-slate-800 truncate">{candidate.email}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Phone Card */}
+            <div className="group bg-white border-2 border-blue-200 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer">
+              <div className="flex items-start gap-3">
+                <div className="p-2.5 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg shadow-sm group-hover:scale-110 transition-transform">
+                  <Phone className="h-5 w-5 text-blue-700 flex-shrink-0" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Phone</div>
+                  <div className="text-sm font-semibold text-slate-800">{candidate.phone}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Experience Card */}
+            <div className="group bg-white border-2 border-indigo-200 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all">
+              <div className="flex items-start gap-3">
+                <div className="p-2.5 bg-gradient-to-br from-indigo-100 to-indigo-200 rounded-lg shadow-sm group-hover:scale-110 transition-transform">
+                  <Briefcase className="h-5 w-5 text-indigo-700 flex-shrink-0" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">Experience</div>
+                  <div className="text-sm font-semibold text-slate-800">{candidate.experience} of experience</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Company Card */}
+            {candidate.currentCompany && (
+              <div className="group bg-white border-2 border-indigo-200 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all">
+                <div className="flex items-start gap-3">
+                  <div className="p-2.5 bg-gradient-to-br from-indigo-100 to-indigo-200 rounded-lg shadow-sm group-hover:scale-110 transition-transform">
+                    <Building className="h-5 w-5 text-indigo-700 flex-shrink-0" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">Current Role</div>
+                    <div className="text-sm font-semibold text-slate-800 truncate">
+                      {candidate.currentPosition} at {candidate.currentCompany}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
-
-          {/* Suitability and Readiness Breakdown */}
-          <div className="space-y-4 mt-4 pt-4 border-t">
-            {/* Suitability */}
-            <DeployabilityFactor
-              label="Suitability"
-              score={suitabilityScore}
-              evidence={suitabilityEvidence}
-            />
-
-            {/* Readiness */}
-            <DeployabilityFactor
-              label="Readiness"
-              score={readinessScore}
-              evidence={readinessEvidence}
-            />
-          </div>
         </div>
-      </div>
 
-      {/* Header with Name, Designation, and Candidate Information */}
-      <div className="p-3 border-b">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-            {candidate.name.charAt(0)}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="mb-2">
-              <p className="font-medium">{candidate.name}</p>
-              <p className="text-xs text-muted-foreground">{candidate.currentPosition || candidate.experience}</p>
-            </div>
-            
-            {/* Contact Information */}
-            <div className="space-y-1 mb-2">
-              <div className="flex items-center gap-2">
-                <Mail className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                <span className="text-xs truncate">{candidate.email}</span>
+        {/* Deployability Score Section - Prominent Card (Green = Success, Positive) */}
+        <div className="p-6 bg-gradient-to-br from-emerald-50/40 via-white to-teal-50/30 border-b-2 border-slate-100">
+          <div className="bg-white rounded-xl border-2 border-emerald-100 shadow-md p-5">
+            {/* Main Score Display - Figure/Ground Principle */}
+            <div className="text-center mb-6">
+              <div className={`inline-flex items-center justify-center w-24 h-24 rounded-full shadow-lg ring-4 ${
+                deployabilityScore >= 80 ? "bg-gradient-to-br from-emerald-400 to-green-500 ring-emerald-100" :
+                deployabilityScore >= 60 ? "bg-gradient-to-br from-amber-400 to-orange-500 ring-amber-100" :
+                "bg-gradient-to-br from-red-400 to-rose-500 ring-red-100"
+              }`}>
+                <span className={`text-3xl font-black ${
+                  deployabilityScore >= 80 ? "text-white" :
+                  deployabilityScore >= 60 ? "text-white" : "text-white"
+                }`}>
+                  {deployabilityScore}
+                  <span className="text-lg font-semibold opacity-90">/100</span>
+                </span>
               </div>
-              <div className="flex items-center gap-2">
-                <Phone className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                <span className="text-xs">{candidate.phone}</span>
-              </div>
-            </div>
-
-            {/* Candidate Metadata */}
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <Briefcase className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                <span className="text-xs">{candidate.experience} of experience</span>
-              </div>
-              {candidate.currentCompany && (
-                <div className="flex items-center gap-2">
-                  <Building className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                  <span className="text-xs truncate">
-                    {candidate.currentPosition} at {candidate.currentCompany}
+              <p className="mt-4 text-base font-bold text-slate-800">Deployability Score</p>
+              {candidate.confidence && (
+                <div className="flex items-center justify-center gap-2 mt-3">
+                  <div className={`p-1.5 rounded-md ${
+                    candidate.confidence >= 80 ? "bg-emerald-100" :
+                    candidate.confidence >= 60 ? "bg-amber-100" : "bg-red-100"
+                  }`}>
+                    <TrendingUp className={`h-4 w-4 ${
+                      candidate.confidence >= 80 ? "text-emerald-700" :
+                      candidate.confidence >= 60 ? "text-amber-700" : "text-red-700"
+                    }`} />
+                  </div>
+                  <span className={`text-sm font-bold ${
+                    candidate.confidence >= 80 ? "text-emerald-700" :
+                    candidate.confidence >= 60 ? "text-amber-700" : "text-red-700"
+                  }`}>
+                    {candidate.confidence}% confidence
                   </span>
                 </div>
               )}
             </div>
+
+            {/* Suitability and Readiness Breakdown - Continuity Principle */}
+            <div className="space-y-5 pt-5 border-t-2 border-slate-200">
+              <DeployabilityFactor
+                label="Suitability"
+                score={suitabilityScore}
+                evidence={suitabilityEvidence}
+                candidate={candidate}
+                onEvidenceClick={(evidence) => setOpenEvidenceViewer({ evidence, type: 'suitability' })}
+              />
+
+              <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+
+              <DeployabilityFactor
+                label="Readiness"
+                score={readinessScore}
+                evidence={readinessEvidence}
+                candidate={candidate}
+                onEvidenceClick={(evidence) => setOpenEvidenceViewer({ evidence, type: 'readiness' })}
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="p-3 space-y-3 bg-muted/20">
-        {/* Agent Job Results */}
-        <AgentJobResults candidate={candidate} />
+        {/* Agent Job Results Section - Common Region Principle */}
+        <div className="p-5 bg-gradient-to-br from-slate-50 to-slate-100/50 border-t-2 border-slate-200">
+          <AgentJobResults candidate={candidate} onEvidenceClick={(evidence) => setOpenEvidenceViewer({ evidence, type: 'agent-job' })} />
+        </div>
       </div>
+      
+      {/* Inline Evidence Viewer - Sticky */}
+      {openEvidenceViewer && (
+        <div className="w-[600px] flex-shrink-0 sticky top-0 self-start h-[calc(100vh-8rem)]">
+          <InlineEvidenceViewer
+            evidence={openEvidenceViewer.evidence}
+            candidate={candidate}
+            onClose={() => setOpenEvidenceViewer(null)}
+          />
+        </div>
+      )}
     </div>
   )
 }
@@ -145,7 +211,9 @@ export function CandidateInfoPanel({ candidate }: CandidateInfoPanelProps) {
 function DeployabilityFactor({ 
   label, 
   score, 
-  evidence 
+  evidence,
+  candidate,
+  onEvidenceClick
 }: { 
   label: string
   score: number
@@ -154,99 +222,146 @@ function DeployabilityFactor({
     matching?: string[]
     nonMatching?: string[]
   }
+  candidate: any
+  onEvidenceClick?: (evidence: any) => void
 }) {
   const [isExpanded, setIsExpanded] = useState(true) // Default to expanded
   const hasEvidence = evidence && (evidence.matching || evidence.nonMatching)
+  const hasSource = evidence?.source && evidence.source.trim().length > 0
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-600"
-    if (score >= 60) return "text-amber-600"
-    return "text-red-600"
+  // Color psychology: Green = success, Amber = caution, Red = warning
+  const getScoreTheme = (score: number) => {
+    if (score >= 80) {
+      return {
+        bg: "bg-emerald-50",
+        border: "border-emerald-200",
+        text: "text-emerald-700",
+        iconBg: "bg-emerald-100",
+        iconColor: "text-emerald-600",
+        progress: "[&>div>div]:bg-emerald-500"
+      }
+    }
+    if (score >= 60) {
+      return {
+        bg: "bg-amber-50",
+        border: "border-amber-200",
+        text: "text-amber-700",
+        iconBg: "bg-amber-100",
+        iconColor: "text-amber-600",
+        progress: "[&>div>div]:bg-amber-500"
+      }
+    }
+    return {
+      bg: "bg-red-50",
+      border: "border-red-200",
+      text: "text-red-700",
+      iconBg: "bg-red-100",
+      iconColor: "text-red-600",
+      progress: "[&>div>div]:bg-red-500"
+    }
   }
 
-  const getProgressColorClass = (score: number) => {
-    if (score >= 80) return "[&>div>div]:bg-green-500"
-    if (score >= 60) return "[&>div>div]:bg-amber-500"
-    return "[&>div>div]:bg-red-500"
-  }
+  const theme = getScoreTheme(score)
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium">{label}:</span>
-        <span className={`text-sm font-semibold ${getScoreColor(score)}`}>
-          {score}/100
-        </span>
-      </div>
-      <div className={getProgressColorClass(score)}>
-        <Progress value={score} className="h-2" />
+    <div className="space-y-4">
+      {/* Score Header - Proximity & Similarity Principles */}
+      <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+        <span className="text-sm font-bold text-slate-800">{label}</span>
+        <div className={`px-3 py-1 rounded-md ${theme.bg} ${theme.border} border-2`}>
+          <span className={`text-sm font-black ${theme.text}`}>
+            {score}/100
+          </span>
+        </div>
       </div>
       
-      {/* Evidence Section */}
+      {/* Progress Bar - Continuity Principle */}
+      <div className={theme.progress}>
+        <Progress value={score} className="h-3 rounded-full" />
+      </div>
+      
+      {/* Evidence Section - Common Region & Closure Principles */}
       {hasEvidence && (
-        <div className="mt-2 border rounded-md overflow-hidden">
+        <div className={`mt-4 border-2 ${theme.border} rounded-xl overflow-hidden bg-white shadow-sm`}>
           <div
-            className="flex items-center justify-between px-2 py-1.5 cursor-pointer hover:bg-muted/50 transition-colors"
+            className={`flex items-center justify-between px-4 py-3 cursor-pointer ${theme.bg} hover:opacity-90 transition-all border-b-2 ${theme.border}`}
             onClick={() => setIsExpanded(!isExpanded)}
           >
-            <span className="text-xs font-medium text-muted-foreground">Evidence</span>
+            <div className="flex items-center gap-2.5">
+              <div className={`p-1.5 rounded-md ${theme.iconBg}`}>
+                <CheckCircle2 className={`h-4 w-4 ${theme.iconColor}`} />
+              </div>
+              <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">Evidence</span>
+            </div>
             {isExpanded ? (
-              <ChevronUp className="h-3 w-3 text-muted-foreground" />
+              <ChevronUp className={`h-4 w-4 ${theme.text}`} />
             ) : (
-              <ChevronDown className="h-3 w-3 text-muted-foreground" />
+              <ChevronDown className={`h-4 w-4 ${theme.text}`} />
             )}
           </div>
           
           {isExpanded && evidence && (
-            <div className="px-2 pb-2 pt-1 border-t bg-background/50">
-              {/* Source */}
+            <div className="p-4 bg-white space-y-5">
+              {/* Source - Figure/Ground Principle */}
               {evidence.source && (
-                <div className="mb-3 pb-2 border-b">
-                  <div className="flex items-center gap-1.5 text-xs">
-                    <span className="font-medium text-muted-foreground">Source:</span>
-                    <span className="text-muted-foreground">{evidence.source}</span>
+                <div 
+                  className={`pb-4 border-b-2 border-slate-200 ${hasSource ? "cursor-pointer hover:bg-blue-50/50 transition-all rounded-lg px-3 py-3 -mx-3" : ""}`}
+                  onClick={() => hasSource && onEvidenceClick && onEvidenceClick(evidence)}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-1.5 bg-blue-100 rounded-md">
+                      <span className="text-xs font-bold text-blue-700 uppercase tracking-wide">Source</span>
+                    </div>
+                    <span className={`text-sm font-semibold text-slate-800 flex-1 ${hasSource ? "underline decoration-2 decoration-blue-400 decoration-dotted" : ""}`}>
+                      {evidence.source}
+                    </span>
+                    {hasSource && (
+                      <span className="text-xs text-blue-600 font-bold ml-auto flex items-center gap-1">
+                        View <span className="text-blue-500">→</span>
+                      </span>
+                    )}
                   </div>
                 </div>
               )}
               
-              <div className="space-y-3">
-                {/* Matching Evidence */}
+              <div className="space-y-4">
+                {/* Matching Evidence - Green Psychology (Success) */}
                 {evidence.matching && Array.isArray(evidence.matching) && evidence.matching.length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />
-                      <span className="text-xs font-semibold text-green-700">Matching Evidence</span>
+                  <div className="bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-lg p-4 shadow-sm">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="p-2 bg-emerald-100 rounded-lg">
+                        <CheckCircle2 className="h-5 w-5 text-emerald-700 flex-shrink-0" />
+                      </div>
+                      <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Matching Evidence</span>
                     </div>
-                    <div className="pl-5">
-                      <ul className="space-y-1.5">
-                        {evidence.matching.map((item, idx) => (
-                          <li key={idx} className="text-xs text-green-700 flex items-start gap-1.5">
-                            <span className="text-green-600 mt-0.5">•</span>
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    <ul className="space-y-2 pl-2">
+                      {evidence.matching.map((item, idx) => (
+                        <li key={idx} className="text-sm text-emerald-900 flex items-start gap-3 font-medium">
+                          <span className="text-emerald-600 mt-1 font-black text-lg leading-none">✓</span>
+                          <span className="leading-relaxed flex-1">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
                 
-                {/* Non-Matching Evidence */}
+                {/* Non-Matching Evidence - Red Psychology (Warning) */}
                 {evidence.nonMatching && Array.isArray(evidence.nonMatching) && evidence.nonMatching.length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <XCircle className="h-3.5 w-3.5 text-red-600" />
-                      <span className="text-xs font-semibold text-red-700">Non-Matching Evidence</span>
+                  <div className="bg-gradient-to-br from-red-50 to-rose-50 border-2 border-red-200 rounded-lg p-4 shadow-sm">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="p-2 bg-red-100 rounded-lg">
+                        <XCircle className="h-5 w-5 text-red-700 flex-shrink-0" />
+                      </div>
+                      <span className="text-xs font-bold text-red-800 uppercase tracking-wider">Non-Matching Evidence</span>
                     </div>
-                    <div className="pl-5">
-                      <ul className="space-y-1.5">
-                        {evidence.nonMatching.map((item, idx) => (
-                          <li key={idx} className="text-xs text-red-700 flex items-start gap-1.5">
-                            <span className="text-red-600 mt-0.5">•</span>
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    <ul className="space-y-2 pl-2">
+                      {evidence.nonMatching.map((item, idx) => (
+                        <li key={idx} className="text-sm text-red-900 flex items-start gap-3 font-medium">
+                          <span className="text-red-600 mt-1 font-black text-lg leading-none">✗</span>
+                          <span className="leading-relaxed flex-1">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
               </div>
